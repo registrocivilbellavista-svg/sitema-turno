@@ -9,7 +9,7 @@
 
     <header style="text-align: center; margin-bottom: 30px;">
         <h1 style="color: #2c3e50;">🏛️ Turnos - Registro Civil Bella Vista</h1>
-        <p style="color: #7f8c8d;">Sistema centralizado para la gestión de trámites en red local e Internet</p>
+        <p style="color: #7f8c8d;">Sistema centralizado para la gestión de Trámites Version 2.2</p>
         
         <!-- Botones para alternar entre Vistas -->
         <div style="margin-top: 20px;">
@@ -20,7 +20,7 @@
     <!-- 1. VISTA: FORMULARIO DE CARGA (PÚBLICO) -->
     <main id="vista-carga" style="display: block; max-width: 500px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
         <h3 style="margin-top: 0; color: #2c3e50; text-align: center; border-bottom: 2px solid #f4f6f9; padding-bottom: 10px;">Agendar Nuevo Turno</h3>
-        <p style="font-size: 12px; color: #7f8c8d; text-align: center; margin-top: 5px;">Lunes a Viernes de 07:30 a 12:00 hs — Intervalos de 15 minutos</p>
+        <p style="font-size: 12px; color: #7f8c8d; text-align: center; margin-top: 5px;">Lunes a Viernes de 07:30 a 12:00 hs</p>
         
         <form id="form-turno" onsubmit="guardarTurno(event)">
             <label style="display:block; margin-bottom:5px; color:#34495e; font-weight:bold; font-size:14px;">Nombre y Apellido:</label>
@@ -28,7 +28,6 @@
             
             <label style="display:block; margin-bottom:5px; color:#34495e; font-weight:bold; font-size:14px;">Número de DNI:</label>
             <input type="number" id="dni" required placeholder="Sin puntos ni espacios" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
-            
             <label style="display:block; margin-bottom:5px; color:#34495e; font-weight:bold; font-size:14px;">Tipo de Trámite:</label>
             <select id="tramite" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box; background: white;">
                 <option value="" disabled selected>Seleccione una opción</option>
@@ -71,14 +70,14 @@
                 <span>📍</span>
                 <div>
                     <strong>Dirección:</strong><br>
-                    Salta 150, Bella Vista, Corrientes.
+                    Salta 150, Bella Vista, Corrientes, Argentina.
                 </div>
             </div>
             <div style="display: flex; align-items: flex-start; gap: 8px;">
                 <span>✉️</span>
                 <div>
                     <strong>Consultas o dudas:</strong><br>
-                    <a href="mailto:registrobellavista@gmail.com" style="color: #3498db; text-decoration: none; font-weight: 500;">registrobellavista@gmail.com</a>
+                    <a href="mailto:registrocivilbellavista@gmail.com" style="color: #3498db; text-decoration: none; font-weight: 500;">registrocivilbellavista@gmail.com</a>
                 </div>
             </div>
         </div>
@@ -86,25 +85,42 @@
     <!-- Ventana Emergente de la Constancia (Tamaño Fijo 25cm x 25cm) -->
     <div id="modal-comprobante" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
         <div style="background: white; padding: 20px; border-radius: 8px; width: 25cm; height: 25cm; box-shadow: 0 4px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; font-family: sans-serif;">
-            <div id="area-impresion" style="padding: 25px; border: 2px dashed #34495e; border-radius: 6px; background: #fff; height: 20cm; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; text-align: center;">
+            
+            <div id="area-impresion" style="padding: 25px; border: 2px dashed #34495e; border-radius: 6px; background: #fff; height: 18cm; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; text-align: center;">
                 <h3 style="margin: 0 0 15px 0; color: #2c3e50; font-size: 18px; line-height: 1.4;">🏛️ Turno Otorgado para Atención en el Registro Civil de Bella Vista</h3>
                 <p style="font-size: 13px; color: #7f8c8d; margin: 0 0 25px 0; border-bottom: 1px solid #eee; padding-bottom: 15px;">Dirección oficial: Salta 150</p>
-                                    <!-- Bloque de datos con el código expandido al final -->
-                    <div style="text-align: left; font-size: 15px; line-height: 1.8; color: #2c3e50; margin-bottom: 20px; padding: 0 10px;">
-                        <div style="margin-bottom: 8px;"><b>📄 Tipo de Trámite:</b> <span id="constancia-tramite" style="font-weight: 500;"></span></div>
-                        <div style="margin-bottom: 8px;"><b>👤 Ciudadano:</b> <span id="constancia-nombre" style="font-weight: 500;"></span></div>
-                        <div style="margin-bottom: 8px;"><b>📅 Fecha y Hora del Turno:</b> <span id="constancia-agenda" style="font-weight: 500;"></span></div>
-                        <div style="margin-bottom: 15px;"><b>📝 Emitido el día:</b> <span id="constancia-registro" style="color: #7f8c8d; font-size: 13px;"></span></div>
-                        
-                        <!-- Código destacado: Ocupa todo el ancho, abajo de los datos y con letra grande -->
-                        <div style="text-align: center; background: #e8f5e9; border: 2px solid #27ae60; padding: 12px; border-radius: 6px; margin-top: 15px; width: 100%; box-sizing: border-box;">
-                            <small style="display: block; color: #27ae60; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; font-size: 11px; margin-bottom: 4px;">🔑 Código Único de Turno</small>
-                            <span id="constancia-codigo" style="font-size: 28px; font-weight: 900; color: #1e7e34; letter-spacing: 2px; font-family: monospace;"></span>
-                        </div>
+                
+                <div style="text-align: left; font-size: 15px; line-height: 1.8; color: #2c3e50; margin-bottom: 20px; padding: 0 10px;">
+                    <div style="margin-bottom: 8px;"><b>📄 Tipo de Trámite:</b> <span id="constancia-tramite" style="font-weight: 500;"></span></div>
+                    <div style="margin-bottom: 8px;"><b>👤 Ciudadano:</b> <span id="constancia-nombre" style="font-weight: 500;"></span></div>
+                    <div style="margin-bottom: 8px;"><b>📅 Fecha y Hora del Turno:</b> <span id="constancia-agenda" style="font-weight: 500;"></span></div>
+                    <div style="margin-bottom: 15px;"><b>📝 Emitido el día:</b> <span id="constancia-registro" style="color: #7f8c8d; font-size: 13px;"></span></div>
+                    
+                    <div style="text-align: center; background: #e8f5e9; border: 2px solid #27ae60; padding: 12px; border-radius: 6px; margin-top: 15px; width: 100%; box-sizing: border-box;">
+                        <small style="display: block; color: #27ae60; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; font-size: 11px; margin-bottom: 4px;">🔑 Código Único de Turno</small>
+                        <span id="constancia-codigo" style="font-size: 28px; font-weight: 900; color: #1e7e34; letter-spacing: 2px; font-family: monospace;"></span>
                     </div>
-            <div style="display: flex; gap: 15px; height: 1.5cm; align-items: center;">
-                <button onclick="imprimirConstanciaLocal()" style="flex: 1; background: #2ecc71; color: white; border: none; padding: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 14px;">🖨️ Imprimir / Guardar PDF</button>
-                <button onclick="cerrarConstancia()" style="flex: 1; background: #95a5a6; color: white; border: none; padding: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 14px;">Cerrar</button>
+                </div>
+                <p style="font-size: 12px; color: #e67e22; margin: 15px 0 0 0; font-weight: 500;">⚠️ Por favor, guarde este comprobante para presentar el día del trámite.</p>
+            </div>
+            <!-- Botones de Acción en el borde inferior (Distribuidos en 2 filas) -->
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="imprimirConstanciaLocal()" style="flex: 1; background: #2ecc71; color: white; border: none; padding: 12px 5px; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 2px 4px rgba(46,204,113,0.2);">
+                        🖨️ Imprimir / PDF
+                    </button>
+                    <button onclick="enviarPorWhatsApp()" style="flex: 1; background: #00e676; color: white; border: none; padding: 12px 5px; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,230,118,0.2);">
+                        💬 Enviar por WhatsApp
+                    </button>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="cerrarConstancia()" style="flex: 1.2; background: #3498db; color: white; border: none; padding: 10px 5px; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                        ⬅️ Volver Atrás
+                    </button>
+                    <button onclick="salirCompletamente()" style="flex: 0.8; background: #e74c3c; color: white; border: none; padding: 10px 5px; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                        ❌ Salir
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -223,6 +239,12 @@
 
         function cerrarConstancia() {
             document.getElementById('modal-comprobante').style.display = 'none';
+        }
+
+        function salirCompletamente() {
+            document.getElementById('modal-comprobante').style.display = 'none';
+            mostrarVista('carga');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         async function actualizarHorariosDisponibles() {
             const fechaSeleccionada = document.getElementById('fecha').value;
@@ -434,49 +456,12 @@
                 }
             }
         }
-            function imprimirConstanciaLocal() {
+        function imprimirConstanciaLocal() {
             const contenido = document.getElementById('area-impresion').innerHTML;
             const ventanaImpresion = window.open('', '_blank', 'height=700,width=700');
-            
             const etiquetaCierreScript = '</' + 'script>';
             
             ventanaImpresion.document.write(`
-                <html>
-                <head>
-                    <title>Comprobante de Turno - Registro Civil Bella Vista</title>
-                    <style>
-                        @page { size: 25cm 25cm; margin: 0; }
-                        body { 
-                            font-family: system-ui, sans-serif; 
-                            margin: 0; 
-                            padding: 2.5cm; 
-                            width: 25cm; 
-                            height: 25cm; 
-                            box-sizing: border-box; 
-                            color: #2c3e50; 
-                            display: flex; 
-                            flex-direction: column; 
-                            justify-content: center; 
-                            text-align: center; 
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div style="border: 2px dashed #34495e; border-radius: 6px; padding: 30px; height: 100%; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center;">
-                        ${contenido}
-                    </div>
-                    <script>
-                        window.onload = function() { 
-                            window.print(); 
-                            setTimeout(function() { window.close(); }, 500); 
-                        }
-                    ${etiquetaCierreScript}
-                </body>
-                </html>
-            `);
-            ventanaImpresion.document.close();
-        }
-
                 <html>
                 <head>
                     <title>Comprobante de Turno - Registro Civil Bella Vista</title>
@@ -499,6 +484,28 @@
                 </html>
             `);
             ventanaImpresion.document.close();
+        }
+
+        function enviarPorWhatsApp() {
+            const codigo = document.getElementById('constancia-codigo').innerText;
+            const tramite = document.getElementById('constancia-tramite').innerText;
+            const ciudadano = document.getElementById('constancia-nombre').innerText;
+            const agenda = document.getElementById('constancia-agenda').innerText;
+            const emision = document.getElementById('constancia-registro').innerText;
+
+            const mensajeOriginal = 
+                `🏛️ *COMPROBANTE DE TURNO*\n` +
+                `*Registro Civil Bella Vista*\n\n` +
+                `¡Hola, *${ciudadano}*! Tu turno fue procesado con éxito:\n\n` +
+                `🔑 *Código de Turno:* ${codigo}\n` +
+                `📄 *Tipo de Trámite:* ${tramite}\n` +
+                `📅 *Fecha y Hora:* ${agenda}\n\n` +
+                `📍 *Dirección:* Salta 150, Bella Vista\n` +
+                `📝 _Comprobante emitido el ${emision}_\n\n` +
+                `⚠️ *Importante:* Por favor, guardá este mensaje y presentalo al ingresar a la oficina.`;
+
+            const urlWhatsApp = `https://whatsapp.com{encodeURIComponent(mensajeOriginal)}`;
+            window.open(urlWhatsApp, '_blank');
         }
 
         function exportarAgendaAExcel() {
@@ -528,11 +535,11 @@
                 
                 const tramite = el.querySelector('span') ? el.querySelector('span').innerText : 'General';
                 const codMatch = el.innerText.match(/COD:\s*(RC\d+)/);
-                const cod = (codMatch && codMatch[1]) ? codMatch[1] : 'N/A';
+                const cod = (codMatch && codMatch) ? codMatch : 'N/A';
                 
                 const nombre = el.querySelector('strong') ? el.querySelector('strong').innerText : 'N/C';
                 const horaMatch = el.innerText.match(/Horario asignado:\s*([^\s\n]+)/);
-                const hora = (horaMatch && horaMatch[1]) ? horaMatch[1] : 'N/A';
+                const hora = (horaMatch && horaMatch) ? horaMatch : 'N/A';
                 
                 const est = el.innerText.includes("✅ ATENDIDO") ? "Atendido" : "Pendiente";
                 
