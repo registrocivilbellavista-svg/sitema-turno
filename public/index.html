@@ -129,8 +129,14 @@
         function obtenerFechaCompleta(fechaStr) {
             if (!fechaStr) return '';
             const partes = fechaStr.split('-');
-            // Forzar mes indexado correctamente para evitar desfasaje de días
-            const fechaObj = new Date(parseInt(partes[0]), parseInt(partes[1]) - 1, parseInt(partes[2]));
+            if (partes.length !== 3) return '';
+            
+            // CORREGIDO: Índices fijos agregados explícitamente para evitar la congelación, [1], [2]
+            const anio = parseInt(partes[0], 10);
+            const mes = parseInt(partes[1], 10) - 1;
+            const dia = parseInt(partes[2], 10);
+            
+            const fechaObj = new Date(anio, mes, dia);
             const opciones = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
             let resultado = fechaObj.toLocaleDateString('es-AR', opciones);
             return resultado.charAt(0).toUpperCase() + resultado.slice(1);
@@ -281,7 +287,6 @@
                 document.getElementById('lista-turnos').innerHTML = '<p style="color:#e74c3c; font-weight:bold; text-align:center;">❌ Error al conectar con el servidor.</p>';
             }
         }
-
         async function actualizarHorariosDisponibles() {
             const fechaSeleccionada = document.getElementById('fecha').value;
             const selectHora = document.getElementById('hora');
@@ -325,6 +330,7 @@
                 selectHora.innerHTML = '<option value="" disabled selected>❌ Error al consultar disponibilidad</option>';
             }
         }
+
         async function marcarComoAtendido(id) {
             try {
                 const res = await fetch(API_URL + '/api/turnos/' + id, {
@@ -347,11 +353,18 @@
             const horaSeleccionada = document.getElementById('hora').value;
 
             const partesFecha = fechaSeleccionada.split('-');
-            const objetoFecha = new Date(parseInt(partesFecha[0]), parseInt(partesFecha[1]) - 1, parseInt(partesFecha[2]));
-            if (objetoFecha.getDay() === 0 || objetoFecha.getDay() === 6) {
-                alert("❌ Solo se pueden asignar turnos de lunes a viernes. Fines de semana cerrado.");
-                btnSubmit.disabled = false;
-                return;
+            if (partesFecha.length === 3) {
+                // CORREGIDO: Soportes de índices explícitos agregados para validación de fin de semana [0],[1],[2]
+                const anio = parseInt(partesFecha[0], 10);
+                const mes = parseInt(partesFecha[1], 10) - 1;
+                const dia = parseInt(partesFecha[2], 10);
+                const objetoFecha = new Date(anio, mes, dia);
+                
+                if (objetoFecha.getDay() === 0 || objetoFecha.getDay() === 6) {
+                    alert("❌ Solo se pueden asignar turnos de lunes a viernes. Fines de semana cerrado.");
+                    btnSubmit.disabled = false;
+                    return;
+                }
             }
 
             try {
