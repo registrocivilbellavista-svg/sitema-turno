@@ -9,7 +9,7 @@
 
     <header style="text-align: center; margin-bottom: 30px;">
         <h1 style="color: #2c3e50;">🏛️ Turnos - Registro Civil Bella Vista</h1>
-        <p style="color: #7f8c8d;">Sistema centralizado para la gestión de Trámites Version 2.5</p>
+        <p style="color: #7f8c8d;">Sistema centralizado para la gestión de Trámites Version 2.7</p>
         
         <!-- Botones para alternar entre Vistas -->
         <div style="margin-top: 20px;">
@@ -507,26 +507,33 @@
             ventanaImpresion.document.close();
         }
 
-        function enviarPorWhatsApp() {
+               function enviarPorWhatsApp() {
+            // Capturar los datos cargados actualmente en la constancia de pantalla
             const codigo = document.getElementById('constancia-codigo').innerText;
             const tramite = document.getElementById('constancia-tramite').innerText;
             const ciudadano = document.getElementById('constancia-nombre').innerText;
             const agenda = document.getElementById('constancia-agenda').innerText;
             const emision = document.getElementById('constancia-registro').innerText;
 
-            const mensajeOriginal = 
-                `🏛️ *COMPROBANTE DE TURNO*\n` +
-                `*Registro Civil Bella Vista*\n\n` +
-                `¡Hola, *${ciudadano}*! Tu turno fue procesado con éxito:\n\n` +
-                `🔑 *Código de Turno:* ${codigo}\n` +
-                `📄 *Tipo de Trámite:* ${tramite}\n` +
-                `📅 *Fecha y Hora:* ${agenda}\n\n` +
-                `📍 *Dirección:* Salta 150, Bella Vista\n` +
-                `📝 _Comprobante emitido el ${emision}_\n\n` +
-                `⚠️ *Importante:* Por favor, guardá este mensaje y presentalo al ingresar a la oficina.`;
+            // Armamos el texto en una sola línea usando \n para los saltos de forma limpia
+            let textoMensaje = "🏛️ *COMPROBANTE DE TURNO*\n";
+            textoMensaje += "*Registro Civil Bella Vista*\n\n";
+            textoMensaje += "¡Hola, *" + ciudadano + "*! Tu turno fue procesado con éxito:\n\n";
+            textoMensaje += "🔑 *Código de Turno:* " + codigo + "\n";
+            textoMensaje += "📄 *Tipo de Trámite:* " + tramite + "\n";
+            textoMensaje += "📅 *Fecha y Hora:* " + agenda + "\n\n";
+            textoMensaje += "📍 *Dirección:* Salta 150, Bella Vista\n";
+            textoMensaje += "📝 _Comprobante emitido el " + emision + "_\n\n";
+            textoMensaje += "⚠️ *Importante:* Por favor, guardá este mensaje y presentalo al ingresar a la oficina.";
 
-            const urlWhatsApp = `https://whatsapp.com{encodeURIComponent(mensajeOriginal)}`;
-            window.open(urlWhatsApp, '_blank');
+            // Forzar codificación global de caracteres y símbolos especiales
+            const textoLimpioCodificado = encodeURIComponent(textoMensaje);
+            
+            // Usamos el enlace universal oficial que redirige correctamente en cualquier dispositivo
+            const urlWhatsAppOficial = "https://wa.me" + textoLimpioCodificado;
+            
+            // Abrir en pestaña nueva de forma segura
+            window.open(urlWhatsAppOficial, '_blank');
         }
 
         function exportarAgendaAExcel() {
@@ -556,11 +563,11 @@
                 
                 const tramite = el.querySelector('span') ? el.querySelector('span').innerText : 'General';
                 const codMatch = el.innerText.match(/COD:\s*(RC\d+)/);
-                const cod = (codMatch && codMatch) ? codMatch : 'N/A';
+                const cod = (codMatch && codMatch[1]) ? codMatch[1] : 'N/A';
                 
                 const nombre = el.querySelector('strong') ? el.querySelector('strong').innerText : 'N/C';
                 const horaMatch = el.innerText.match(/Horario asignado:\s*([^\s\n]+)/);
-                const hora = (horaMatch && horaMatch) ? horaMatch : 'N/A';
+                const hora = (horaMatch && horaMatch[1]) ? horaMatch[1] : 'N/A';
                 
                 const est = el.innerText.includes("✅ ATENDIDO") ? "Atendido" : "Pendiente";
                 
