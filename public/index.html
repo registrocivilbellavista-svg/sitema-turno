@@ -14,7 +14,7 @@
         <!-- Botones para alternar entre Vistas -->
         <div style="margin-top: 20px;">
             <button onclick="mostrarVista('carga')" id="btn-vista-carga" style="background: #3498db; color: white; border: none; padding: 10px 20px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-right: 10px;">📄 Formulario de Carga</button>
-            <button onclick="solicitarAccesoEncargados()" id="btn-vista-panel" style="background: #7f8c8d; color: white; border: none; padding: 10px 20px; font-weight: bold; border-radius: 4px; cursor: pointer;">🔑 Panel de Encargados (Privado)</button>
+            <button onclick="solicitarAccAccessoEncargados()" id="btn-vista-panel" style="background: #7f8c8d; color: white; border: none; padding: 10px 20px; font-weight: bold; border-radius: 4px; cursor: pointer;">🔑 Panel de Encargados (Privado)</button>
         </div>
     </header>
 
@@ -52,14 +52,14 @@
 
             <div style="display: flex; gap: 4%; margin-bottom: 20px;">
                 <div style="width: 48%;">
-                    <label style="display:block; margin-bottom:5px; color:#34495e; font-weight:bold; font-size:14px;">Fecha:</label>
+                    <label style="display:block; margin-bottom:5px; color:#34495e; font-weight:bold; font-size:14px;">Fecha del Turno:</label>
                     <input type="date" id="fecha" required style="width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
-                    <small id="fecha-texto-ciudadano" style="display:block; margin-top:5px; color:#e67e22; font-weight:bold; font-size:11px;"></small>
+                    <small id="fecha-texto-ciudadano" style="display:block; margin-top:5px; color:#e67e22; font-weight:bold; font-size:11px; min-height:15px;"></small>
                 </div>
                 <div style="width: 48%;">
-                    <label style="display:block; margin-bottom:5px; color:#34495e; font-weight:bold; font-size:14px;">Hora:</label>
+                    <label style="display:block; margin-bottom:5px; color:#34495e; font-weight:bold; font-size:14px;">Horario Disponible:</label>
                     <select id="hora" required style="width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box; background: white; height:40px;">
-                        <option value="" disabled selected>Seleccione fecha primero</option>
+                        <option value="" disabled selected>Elige una fecha primero</option>
                     </select>
                 </div>
             </div>
@@ -80,11 +80,13 @@
     </main>
     <!-- 2. VISTA: PANEL DE ENCARGADOS (PRIVADO) -->
     <main id="vista-panel" style="display: none;">
+        <!-- Fila Superior de Control con Calendario Mensual -->
         <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
             <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
                 <h3 style="margin: 0; color: #2c3e50;">🔒 Panel de Control e Información de Cargos</h3>
+                <!-- Calendario Mensual de Filtrado Interno -->
                 <div style="display: flex; align-items: center; gap: 8px; background: #f4f6f9; padding: 6px 12px; border-radius: 4px; border: 1px solid #ddd;">
-                    <label for="filtro-fecha" style="font-size: 13px; font-weight: bold; color: #555;">📅 Ver Día:</label>
+                    <label for="filtro-fecha" style="font-size: 13px; font-weight: bold; color: #555;">📅 Seleccionar Día:</label>
                     <input type="date" id="filtro-fecha" onchange="cargarTurnos()" style="border: none; background: transparent; font-family: inherit; font-size: 14px; color: #2c3e50; cursor: pointer; outline: none;">
                 </div>
             </div>
@@ -92,14 +94,15 @@
         </div>
 
         <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+            <!-- Columnas de Visualización de Turnos por Hora -->
             <section style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
                 <div style="border-bottom: 2px solid #f4f6f9; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
-                    <h4 style="margin: 0; color: #2c3e50;">📅 Cronograma de Ciudadanos por Día y Hora</h4>
-                    <span id="contador-diario" style="background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold;">Cargando cupos...</span>
+                    <h4 style="margin: 0; color: #2c3e50;" id="contador-diario">Cargando fecha del cronograma...</h4>
                 </div>
                 <div id="lista-turnos">Cargando turnos en red...</div>
             </section>
 
+            <!-- Pizarra Administrativa Derecha -->
             <aside style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); align-self: start;">
                 <h4 style="margin-top: 0; color: #2c3e50; border-bottom: 2px solid #f4f6f9; padding-bottom: 10px;">📋 Tareas y Estado de Gestión</h4>
                 <div style="font-size: 13px; line-height: 1.5; color: #2c3e50;">
@@ -117,7 +120,7 @@
             </aside>
         </div>
     </main>
-      <script>
+    <script>
         const API_URL = window.location.origin;
         let esEncargadoAutenticado = false;
         const CLAVE_ENCARGADOS = "bella123"; 
@@ -126,13 +129,14 @@
         function obtenerFechaCompleta(fechaStr) {
             if (!fechaStr) return '';
             const partes = fechaStr.split('-');
-            const fechaObj = new Date(partes[0], partes[1] - 1, partes[2]);
+            // Forzar mes indexado correctamente para evitar desfasaje de días
+            const fechaObj = new Date(parseInt(partes[0]), parseInt(partes[1]) - 1, parseInt(partes[2]));
             const opciones = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
             let resultado = fechaObj.toLocaleDateString('es-AR', opciones);
             return resultado.charAt(0).toUpperCase() + resultado.slice(1);
         }
 
-        // Al arrancar la página, inicializa las fechas de hoy en formato local argentino
+        // Al arrancar la página, sincroniza calendarios locales
         window.addEventListener('DOMContentLoaded', () => {
             const hoy = new Date();
             const offset = hoy.getTimezoneOffset();
@@ -175,7 +179,7 @@
             }
         }
 
-        function solicitarAccesoEncargados() {
+        function solicitarAccAccessoEncargados() {
             if (esEncargadoAutenticado) {
                 mostrarVista('panel');
                 return;
@@ -194,14 +198,12 @@
             mostrarVista('carga');
         }
 
-        // Genera el código con formato RC000
         function generarCodigoVerificacion() {
             const letras = "RC";
             const numeroAleatorio = Math.floor(Math.random() * 1000);
             const numeroFormateado = String(numeroAleatorio).padStart(3, '0');
             return letras + numeroFormateado;
         }
-
         async function cargarTurnos() {
             if (!esEncargadoAutenticado) return;
             const fechaSeleccionada = document.getElementById('filtro-fecha').value;
@@ -218,7 +220,7 @@
                 document.getElementById('contador-diario').innerText = obtenerFechaCompleta(fechaSeleccionada) + " — " + turnosDelDia.length + " de 20 turnos";
 
                 if (!turnosDelDia || turnosDelDia.length === 0) {
-                    contenedor.innerHTML = '<p style="color:#7f8c8d; text-align:center; padding: 20px; font-weight: 500;">No hay ciudadanos agendados.</p>';
+                    contenedor.innerHTML = '<p style="color:#7f8c8d; text-align:center; padding: 20px; font-weight: 500;">No hay ciudadanos agendados para este día.</p>';
                     return;
                 }
 
@@ -279,6 +281,7 @@
                 document.getElementById('lista-turnos').innerHTML = '<p style="color:#e74c3c; font-weight:bold; text-align:center;">❌ Error al conectar con el servidor.</p>';
             }
         }
+
         async function actualizarHorariosDisponibles() {
             const fechaSeleccionada = document.getElementById('fecha').value;
             const selectHora = document.getElementById('hora');
@@ -322,7 +325,6 @@
                 selectHora.innerHTML = '<option value="" disabled selected>❌ Error al consultar disponibilidad</option>';
             }
         }
-
         async function marcarComoAtendido(id) {
             try {
                 const res = await fetch(API_URL + '/api/turnos/' + id, {
@@ -345,9 +347,9 @@
             const horaSeleccionada = document.getElementById('hora').value;
 
             const partesFecha = fechaSeleccionada.split('-');
-            const objetoFecha = new Date(partesFecha[0], partesFecha[1] - 1, partesFecha[2]);
+            const objetoFecha = new Date(parseInt(partesFecha[0]), parseInt(partesFecha[1]) - 1, parseInt(partesFecha[2]));
             if (objetoFecha.getDay() === 0 || objetoFecha.getDay() === 6) {
-                alert("❌ Solo se pueden asignar turnos de lunes a viernes.");
+                alert("❌ Solo se pueden asignar turnos de lunes a viernes. Fines de semana cerrado.");
                 btnSubmit.disabled = false;
                 return;
             }
