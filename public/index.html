@@ -54,10 +54,13 @@
                 <div style="width: 48%;">
                     <label style="display:block; margin-bottom:5px; color:#34495e; font-weight:bold; font-size:14px;">Fecha:</label>
                     <input type="date" id="fecha" required style="width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
+                    <small id="fecha-texto-ciudadano" style="display:block; margin-top:5px; color:#e67e22; font-weight:bold; font-size:11px;"></small>
                 </div>
                 <div style="width: 48%;">
                     <label style="display:block; margin-bottom:5px; color:#34495e; font-weight:bold; font-size:14px;">Hora:</label>
-                    <input type="time" id="hora" required min="07:30" max="12:00" step="600" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
+                    <select id="hora" required style="width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box; background: white; height:40px;">
+                        <option value="" disabled selected>Seleccione fecha primero</option>
+                    </select>
                 </div>
             </div>
             
@@ -77,11 +80,9 @@
     </main>
     <!-- 2. VISTA: PANEL DE ENCARGADOS (PRIVADO) -->
     <main id="vista-panel" style="display: none;">
-        <!-- Fila Superior de Control con Calendario Mensual -->
         <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
             <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
                 <h3 style="margin: 0; color: #2c3e50;">🔒 Panel de Control e Información de Cargos</h3>
-                <!-- Calendario Mensual de Filtrado -->
                 <div style="display: flex; align-items: center; gap: 8px; background: #f4f6f9; padding: 6px 12px; border-radius: 4px; border: 1px solid #ddd;">
                     <label for="filtro-fecha" style="font-size: 13px; font-weight: bold; color: #555;">📅 Ver Día:</label>
                     <input type="date" id="filtro-fecha" onchange="cargarTurnos()" style="border: none; background: transparent; font-family: inherit; font-size: 14px; color: #2c3e50; cursor: pointer; outline: none;">
@@ -91,7 +92,6 @@
         </div>
 
         <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
-            <!-- Columna Izquierda: Cronograma de Turnos -->
             <section style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
                 <div style="border-bottom: 2px solid #f4f6f9; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
                     <h4 style="margin: 0; color: #2c3e50;">📅 Cronograma de Ciudadanos por Día y Hora</h4>
@@ -100,25 +100,18 @@
                 <div id="lista-turnos">Cargando turnos en red...</div>
             </section>
 
-            <!-- Columna Derecha: Tareas de la oficina -->
             <aside style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); align-self: start;">
                 <h4 style="margin-top: 0; color: #2c3e50; border-bottom: 2px solid #f4f6f9; padding-bottom: 10px;">📋 Tareas y Estado de Gestión</h4>
                 <div style="font-size: 13px; line-height: 1.5; color: #2c3e50;">
                     <div style="background: #fff9c4; padding: 10px; border-radius: 4px; border-left: 4px solid #fbc02d; margin-bottom: 12px;">
                         <strong>⚠️ Reclamos Críticos / Enlace Chutro:</strong><br>
-                        • Agilizar trámites trabados con RENAPER central (pasaportes express demorados).<br>
+                        • Agilizar trámites trabados con RENAPER central.<br>
                         • Revisar expediente de radicación y residencia.
                     </div>
                     <div style="background: #e3f2fd; padding: 10px; border-radius: 4px; border-left: 4px solid #1e88e5; margin-bottom: 12px;">
                         <strong>💼 Rectificaciones e Identidad:</strong><br>
-                        • Corregir errores en nombres, fechas y marcación de género en actas locales.<br>
-                        • Coordinación interprovincial de partidas (Santa Fe, Formosa, Bs. As.).
-                    </div>
-                    <div style="background: #f5f5f5; padding: 10px; border-radius: 4px; border-left: 4px solid #757575;">
-                        <strong>⚙️ Parámetros de la Oficina:</strong><br>
-                        • Atiende: Lun a Vie (07:30 a 12:00 hs).<br>
-                        • Intervalo fijo: 10 minutos.<br>
-                        • Cupo: 20 diarios máximos.
+                        • Corregir errores en nombres, fechas y actas locales.<br>
+                        • Coordinación interprovincial de partidas.
                     </div>
                 </div>
             </aside>
@@ -129,13 +122,43 @@
         let esEncargadoAutenticado = false;
         const CLAVE_ENCARGADOS = "bella123"; 
 
-        // Inicializa el calendario con la fecha local de hoy al arrancar
+        // FUNCIÓN AUXILIAR: Transforma "2026-09-28" en "Lunes 28 de Septiembre de 2026"
+        function obtenerFechaCompleta(fechaStr) {
+            if (!fechaStr) return '';
+            const partes = fechaStr.split('-');
+            const fechaObj = new Date(partes[0], partes[1] - 1, partes[2]);
+            const opciones = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            let resultado = fechaObj.toLocaleDateString('es-AR', opciones);
+            return resultado.charAt(0).toUpperCase() + resultado.slice(1);
+        }
+
+        // Al arrancar la página, inicializa las fechas de hoy en formato local argentino
         window.addEventListener('DOMContentLoaded', () => {
             const hoy = new Date();
             const offset = hoy.getTimezoneOffset();
             const fechaLocal = new Date(hoy.getTime() - (offset * 60 * 1000));
-            document.getElementById('filtro-fecha').value = fechaLocal.toISOString().split('T')[0];
+            const fechaHoyString = fechaLocal.toISOString().split('T')[0];
+            
+            document.getElementById('filtro-fecha').value = fechaHoyString;
+            
+            const campoFechaCarga = document.getElementById('fecha');
+            campoFechaCarga.value = fechaHoyString;
+            campoFechaCarga.addEventListener('change', () => {
+                actualizarHorariosDisponibles();
+                mostrarFechaTextoCiudadano();
+            });
+            
+            mostrarFechaTextoCiudadano();
+            actualizarHorariosDisponibles();
         });
+
+        function mostrarFechaTextoCiudadano() {
+            const fechaVal = document.getElementById('fecha').value;
+            const contenedorTexto = document.getElementById('fecha-texto-ciudadano');
+            if (contenedorTexto) {
+                contenedorTexto.innerText = obtenerFechaCompleta(fechaVal);
+            }
+        }
 
         function mostrarVista(vista) {
             if (vista === 'carga') {
@@ -176,7 +199,7 @@
             const letras = "RC";
             const numeroAleatorio = Math.floor(Math.random() * 1000);
             const numeroFormateado = String(numeroAleatorio).padStart(3, '0');
-            return `${letras}${numeroFormateado}`;
+            return letters + numeroFormateado;
         }
 
         async function cargarTurnos() {
@@ -192,25 +215,23 @@
                 contenedor.innerHTML = '';
                 
                 const turnosDelDia = turnos.filter(t => t.fecha === fechaSeleccionada);
-                
+                document.getElementById('contador-diario').innerText = `${obtenerFechaCompleta(fechaSeleccionada)} — ${turnosDelDia.length} de 20 turnos`;
+
                 if (!turnosDelDia || turnosDelDia.length === 0) {
-                    const [anio, mes, dia] = fechaSeleccionada.split('-');
-                    contenedor.innerHTML = `<p style="color:#7f8c8d; text-align:center; padding: 20px; font-weight: 500;">No hay ciudadanos agendados para el día ${dia}/${mes}/${anio}.</p>`;
-                    document.getElementById('contador-diario').innerText = "Hoy: 0 de 20 turnos asignados";
+                    contenedor.innerHTML = '<p style="color:#7f8c8d; text-align:center; padding: 20px; font-weight: 500;">No hay ciudadanos agendados.</p>';
                     return;
                 }
 
                 turnosDelDia.sort((a, b) => a.hora.localeCompare(b.hora));
-                document.getElementById('contador-diario').innerText = `Hoy: ${turnosDelDia.length} de 20 turnos asignados`;
 
                 turnosDelDia.forEach(t => {
                     const div = document.createElement('div');
                     const estaAtendido = t.atendido === true || t.atendido === "true";
                     
                     if (estaAtendido) {
-                        div.style.cssText = "background: #f8f9fa; padding: 15px; margin-bottom: 12px; border-radius: 6px; border: 1px solid #e2e8f0; border-left: 6px solid #94a3b8; position: relative; opacity: 0.6; transition: all 0.3s ease;";
+                        div.style.cssText = "background: #f8f9fa; padding: 15px; margin-bottom: 12px; border-radius: 6px; border: 1px solid #e2e8f0; border-left: 6px solid #94a3b8; position: relative; opacity: 0.6;";
                     } else {
-                        div.style.cssText = "background: #ffffff; padding: 15px; margin-bottom: 12px; border-radius: 6px; border: 1px solid #e2e8f0; border-left: 6px solid #2ecc71; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: all 0.3s ease;";
+                        div.style.cssText = "background: #ffffff; padding: 15px; margin-bottom: 12px; border-radius: 6px; border: 1px solid #e2e8f0; border-left: 6px solid #2ecc71; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.02);";
                     }
                     
                     div.innerHTML = `
@@ -228,22 +249,65 @@
                                 ⏱️ Horario asignado: ${t.hora} hs
                             </div>
                         </div>
-                        
                         <div style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 8px;">
-                            <button onclick="marcarComoAtendido('${t.id}')" ${estaAtendido ? 'disabled' : ''} style="background: ${estaAtendido ? '#cbd5e1' : '#2ecc71'}; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: ${estaAtendido ? 'default' : 'pointer'}; font-size: 12px; font-weight: bold; transition: background 0.2s;">
-                                ${estaAtendido ? 'Atendido' : 'Marcar Atendido'}
+                            <button onclick="marcarComoAtendido('${t.id}')" ${estaAtendido ? 'disabled' : ''} style="background: ${estaAtendido ? '#cbd5e1' : '#2ecc71'}; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">
+                                Atendido
                             </button>
-                            <button onclick="eliminarTurno('${t.id}')" style="background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; transition: background 0.2s;">
+                            <button onclick="eliminarTurno('${t.id}')" style="background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">
                                 Cancelar Turno
                             </button>
                         </div>
                     `;
                     contenedor.appendChild(div);
                 });
-            } catch (e) {
+            } catch (error) {
                 document.getElementById('lista-turnos').innerHTML = '<p style="color:#e74c3c; font-weight:bold; text-align:center;">❌ Error al conectar con el servidor.</p>';
             }
         }
+        async function actualizarHorariosDisponibles() {
+            const fechaSeleccionada = document.getElementById('fecha').value;
+            const selectHora = document.getElementById('hora');
+            if (!fechaSeleccionada) return;
+            
+            selectHora.innerHTML = '<option value="" disabled selected>Cargando horarios libres...</option>';
+            const franjasBase = [];
+            let h = 7, m = 30;
+            while (h < 12) {
+                franjasBase.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
+                m += 10;
+                if (m >= 60) { m = 0; h++; }
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/api/turnos`);
+                const turnos = res.ok ? await res.json() : [];
+                const turnosDelDia = turnos.filter(t => t.fecha === fechaSeleccionada);
+                
+                if (turnosDelDia.length >= 20) {
+                    selectHora.innerHTML = '<option value="" disabled selected>❌ Cupo completo (Máx 20)</option>';
+                    return;
+                }
+
+                const horasOcupadas = turnosDelDia.map(t => t.hora);
+                const horasLibres = franjasBase.filter(hora => !horasOcupadas.includes(hora));
+                
+                selectHora.innerHTML = '';
+                if (horasLibres.length === 0) {
+                    selectHora.innerHTML = '<option value="" disabled selected>❌ No quedan horarios libres</option>';
+                    return;
+                }
+                
+                horasLibres.forEach(hora => {
+                    const opt = document.createElement('option');
+                    opt.value = hora;
+                    opt.innerText = `${hora} hs`;
+                    selectHora.appendChild(opt);
+                });
+            } catch (error) {
+                selectHora.innerHTML = '<option value="" disabled selected>❌ Error al consultar disponibilidad</option>';
+            }
+        }
+
         async function marcarComoAtendido(id) {
             try {
                 const res = await fetch(`${API_URL}/api/turnos/${id}`, {
@@ -253,7 +317,7 @@
                 });
                 if (res.ok) await cargarTurnos();
             } catch (err) {
-                alert("Error de conexión al marcar como atendido.");
+                alert("Error al marcar como atendido.");
             }
         }
 
@@ -266,48 +330,15 @@
             const horaSeleccionada = document.getElementById('hora').value;
 
             const partesFecha = fechaSeleccionada.split('-');
-            const objetoFecha = new Date(partesFecha, partesFecha - 1, partesFecha);
-            const diaDeLaSemana = objetoFecha.getDay(); 
-            if (diaDeLaSemana === 0 || diaDeLaSemana === 6) {
+            const objetoFecha = new Date(partesFecha[0], partesFecha[1] - 1, partesFecha[2]);
+            if (objetoFecha.getDay() === 0 || objetoFecha.getDay() === 6) {
                 alert("❌ Solo se pueden asignar turnos de lunes a viernes.");
                 btnSubmit.disabled = false;
                 return;
             }
 
-            if (horaSeleccionada < "07:30" || horaSeleccionada > "12:00") {
-                alert("❌ El horario debe ser entre las 07:30 y las 12:00 hs.");
-                btnSubmit.disabled = false;
-                return;
-            }
-
-            const [horas, minutos] = horaSeleccionada.split(':').map(Number);
-            if (minutos % 10 !== 0) {
-                alert("❌ Los turnos deben ser en intervalos de 10 minutos.");
-                btnSubmit.disabled = false;
-                return;
-            }
-
             try {
-                const resTurnos = await fetch(`${API_URL}/api/turnos`);
-                if (!resTurnos.ok) throw new Error();
-                const todosLosTurnos = await resTurnos.json();
-                
-                const turnosDelDia = todosLosTurnos.filter(t => t.fecha === fechaSeleccionada);
-                if (turnosDelDia.length >= 20) {
-                    alert(`❌ Cupo completo de 20 turnos para el día ${fechaSeleccionada}.`);
-                    btnSubmit.disabled = false;
-                    return;
-                }
-
-                const horaOcupada = turnosDelDia.some(t => t.hora === horaSeleccionada);
-                if (horaOcupada) {
-                    alert(`❌ El horario de las ${horaSeleccionada} hs ya se encuentra reservado.`);
-                    btnSubmit.disabled = false;
-                    return;
-                }
-
                 const codigoUnico = generarCodigoVerificacion();
-
                 const turno = {
                     paciente: document.getElementById('paciente').value,
                     dni: document.getElementById('dni').value,
@@ -327,14 +358,14 @@
                 });
 
                 if (res.ok) {
-                    alert(`✅ Turno agendado con éxito.\n\n🎟️ TICKET DE VERIFICACIÓN: ${codigoUnico}\n\nPor favor, conserve este código para ser atendido en la oficina.`);
+                    alert(`✅ Turno agendado con éxito.\n\n🎟️ TICKET DE VERIFICACIÓN: ${codigoUnico}\n\nFecha: ${obtenerFechaCompleta(fechaSeleccionada)}\nHorario: ${horaSeleccionada} hs.`);
                     document.getElementById('form-turno').reset();
+                    actualizarHorariosDisponibles();
+                    mostrarFechaTextoCiudadano();
                     if(esEncargadoAutenticado) cargarTurnos();
-                } else {
-                    alert("El servidor rechazó la reserva.");
                 }
             } catch (err) {
-                alert("Error de conexión al procesar el turno.");
+                alert("Error al procesar el turno.");
             } finally {
                 btnSubmit.disabled = false;
             }
@@ -343,12 +374,13 @@
         async function eliminarTurno(id) {
             if (confirm("¿Estás seguro de que querés cancelar este turno?")) {
                 try {
-                    const res = await fetch(`${API_URL}/api/turnos/${id}`, {
-                        method: 'DELETE'
-                    });
-                    if (res.ok) await cargarTurnos();
+                    const res = await fetch(`${API_URL}/api/turnos/${id}`, { method: 'DELETE' });
+                    if (res.ok) {
+                        await cargarTurnos();
+                        actualizarHorariosDisponibles();
+                    }
                 } catch (err) {
-                    alert("Error al intentar eliminar el turno.");
+                    alert("Error al eliminar el turno.");
                 }
             }
         }
