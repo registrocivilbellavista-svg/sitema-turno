@@ -6,6 +6,7 @@
     <title>Turnos - Registro Civil Bella Vista</title>
 </head>
 <body style="font-family: system-ui, sans-serif; max-width: 1000px; margin: 30px auto; padding: 0 20px; background-color: #f4f6f9;">
+
     <header style="text-align: center; margin-bottom: 30px;">
         <h1 style="color: #2c3e50;">🏛️ Turnos - Registro Civil Bella Vista</h1>
         <p style="color: #7f8c8d;">Sistema centralizado para la gestión de trámites en red local e Internet</p>
@@ -82,7 +83,6 @@
             </div>
             <button onclick="cerrarSesionPanel()" style="background:#e74c3c; color:white; border:none; padding:8px 16px; font-weight:bold; border-radius:4px; cursor:pointer;">Cerrar Panel</button>
         </div>
-
         <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
             <section style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
                 <div style="border-bottom: 2px solid #f4f6f9; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
@@ -109,10 +109,8 @@
         let esEncargadoAutenticado = false;
         const CLAVE_ENCARGADOS = "bella123"; 
 
-        // MOTOR REESCRITO SIN CORCHETES: Extrae año, mes y día de forma directa y redacta la fecha de corrido
         function obtenerFechaCompleta(fechaStr) {
             if (!fechaStr || fechaStr.length !== 10) return '';
-            
             var anio = parseInt(fechaStr.substring(0, 4), 10);
             var mesNum = parseInt(fechaStr.substring(5, 7), 10);
             var diaNum = parseInt(fechaStr.substring(8, 10), 10);
@@ -123,22 +121,30 @@
             var diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
             var meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
             
-            var nombreDia = diasSemana[fechaObj.getDay()];
-            var nombreMes = meses[fechaObj.getMonth()];
-            
-            return nombreDia + " " + diaNum + " de " + nombreMes + " de " + anio;
+            return diasSemana[fechaObj.getDay()] + " " + diaNum + " de " + meses[fechaObj.getMonth()] + " de " + anio;
+        }
+
+        function calcularSiguienteDiaHabil() {
+            var fecha = new Date();
+            fecha.setDate(fecha.getDate() + 1);
+            if (fecha.getDay() === 6) {
+                fecha.setDate(fecha.getDate() + 2);
+            } else if (fecha.getDay() === 0) {
+                fecha.setDate(fecha.getDate() + 1);
+            }
+            var offset = fecha.getTimezoneOffset();
+            var fechaLocal = new Date(fecha.getTime() - (offset * 60 * 1000));
+            return fechaLocal.toISOString().split('T')[0];
         }
 
         window.addEventListener('DOMContentLoaded', function() {
-            var hoy = new Date();
-            var offset = hoy.getTimezoneOffset();
-            var fechaLocal = new Date(hoy.getTime() - (offset * 60 * 1000));
-            var fechaHoyString = fechaLocal.toISOString().split('T')[0];
-            
-            document.getElementById('filtro-fecha').value = fechaHoyString;
+            var proximoDiaHabil = calcularSiguienteDiaHabil();
+            document.getElementById('filtro-fecha').value = proximoDiaHabil;
             
             var campoFechaCarga = document.getElementById('fecha');
-            campoFechaCarga.value = fechaHoyString;
+            campoFechaCarga.value = proximoDiaHabil;
+            campoFechaCarga.min = proximoDiaHabil;
+            
             campoFechaCarga.addEventListener('change', function() {
                 actualizarHorariosDisponibles();
                 mostrarFechaTextoCiudadano();
@@ -316,26 +322,14 @@
             }
         }
 
-        async function marcarComoAtendido(id) {
-            try {
-                var res = await fetch(API_URL + '/api/turnos/' + id, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ atendido: true })
-                });
-                if (res.ok) await cargarTurnos();
-            } catch (err) {
-                alert("Error al marcar como atendido.");
-            }
-        }
-
         async function guardarTurno(e) {
             e.preventDefault();
             var btnSubmit = e.target.querySelector('button[type="submit"]');
             btnSubmit.disabled = true;
 
             var fechaSeleccionada = document.getElementById('fecha').value;
-            var horaSeleccionada = document.getElementById('hora').value;
+            var horaSeleccionada = document.getElementById('hora');
+            var horaValor = horaSeleccionada ? horaSeleccionada.value : '';
 
             if (fechaSeleccionada && fechaSeleccionada.length === 10) {
                 var anio = parseInt(fechaSeleccionada.substring(0, 4), 10);
@@ -359,7 +353,7 @@
                     mail: document.getElementById('mail').value,
                     telefono: document.getElementById('telefono').value,
                     fecha: fechaSeleccionada,
-                    hora: horaSeleccionada,
+                    hora: horaValor,
                     codigo: codigoUnico,
                     atendido: false
                 };
@@ -371,8 +365,13 @@
                 });
 
                 if (res.ok) {
-                    alert('✅ Turno agendado con éxito.\n\n🎟️ TICKET DE VERIFICACIÓN: ' + codigoUnico + '\n\nFecha: ' + obtenerFechaCompleta(fechaSeleccionada) + '\nHorario: ' + horaSeleccionada + ' hs.');
+                    alert('✅ Turno agendado con éxito.\n\n🎟️ TICKET DE VERIFICACIÓN: ' + codigoUnico + '\n\nFecha: ' + obtenerFechaCompleta(fechaSeleccionada) + '\nHorario: ' + horaValor + ' hs.');
                     document.getElementById('form-turno').reset();
+                    
+                    var proximoDia = calcularSiguienteDiaHabil();
+                    document.getElementById('fecha').value = proximoDia;
+                    document.getElementById('fecha').min = proximoDia;
+                    
                     actualizarHorariosDisponibles();
                     mostrarFechaTextoCiudadano();
                     if(esEncargadoAutenticado) cargarTurnos();
@@ -402,5 +401,3 @@
             if(esEncargadoAutenticado) cargarTurnos();
         }, 3000);
     </script>
-</body>
-</html>
