@@ -9,7 +9,7 @@
 
     <header style="text-align: center; margin-bottom: 30px;">
         <h1 style="color: #2c3e50;">🏛️ Turnos - Registro Civil Bella Vista</h1>
-        <p style="color: #7f8c8d;">Sistema centralizado para la gestión de Trámites Version 4.0</p>
+        <p style="color: #7f8c8d;">Sistema centralizado para la gestión de Trámites Version 4.5</p>
         
         <!-- Botones para alternar entre Vistas -->
         <div style="margin-top: 20px;">
@@ -508,13 +508,13 @@
             // Construcción lineal limpia del mensaje institucional para evitar roturas de URL
             let textoMensaje = "臨 *COMPROBANTE DE TURNO*\n";
             textoMensaje += "*Registro Civil Bella Vista*\n\n";
-            textoMensaje += "隆Hola, *" + ciudadano + "*! Tu turno fue procesado con _茅xito_:\n\n";
-            textoMensaje += "冒 *C贸digo de Turno:* " + codigo + "\n";
-            textoMensaje += "冒 *Tipo de Tr谩mite:* " + tramite + "\n";
+            textoMensaje += "Hola, *" + ciudadano + "*! Tu turno fue procesado con _Exito_:\n\n";
+            textoMensaje += "冒 *Codigo de Turno:* " + codigo + "\n";
+            textoMensaje += "冒 *Tipo de Tramite:* " + tramite + "\n";
             textoMensaje += "冒 *Fecha y Hora:* " + agenda + "\n\n";
-            textoMensaje += "冒 *Direcci贸n:* Salta 150, Bella Vista\n";
+            textoMensaje += "冒 *Dirección:* Salta 150, Bella Vista\n";
             textoMensaje += "艙 _Comprobante emitido el " + emision + "_\n\n";
-            textoMensaje += "盧 *Importante:* Por favor, guard谩 este mensaje y presentalo al ingresar a la oficina.";
+            textoMensaje += "盧 *Importante:* Por favor, guardá este mensaje y presentalo al ingresar a la oficina.";
 
             // Codificar el texto para que los espacios y símbolos sean válidos en la web
             const textoCodificado = encodeURIComponent(textoMensaje);
