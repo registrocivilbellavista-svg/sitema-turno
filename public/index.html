@@ -9,7 +9,7 @@
 
     <header style="text-align: center; margin-bottom: 30px;">
         <h1 style="color: #2c3e50;">🏛️ Turnos - Registro Civil Bella Vista</h1>
-        <p style="color: #7f8c8d;">Sistema centralizado para la gestión de Trámites Version 5.1</p>
+        <p style="color: #7f8c8d;">Sistema centralizado para la gestión de Trámites Version 5.2</p>
         
         <!-- Botones para alternar entre Vistas -->
         <div style="margin-top: 20px;">
@@ -627,15 +627,6 @@
         // ==========================================
 
         // Refresco automático asíncrono en red cada 3 segundos (ESTO YA LO TENÍAS)
-        setInterval(() => {
-            if (typeof esEncargadoAutenticado !== 'undefined' && esEncargadoAutenticado) {
-                cargarTurnos();
-            }
-        }, 3000);
-    </script>
-</body>
-</html>
-
         setInterval(() => {
             if (typeof esEncargadoAutenticado !== 'undefined' && esEncargadoAutenticado) {
                 cargarTurnos();
