@@ -9,7 +9,7 @@
 
     <header style="text-align: center; margin-bottom: 30px;">
         <h1 style="color: #2c3e50;">🏛️ Turnos - Registro Civil Bella Vista</h1>
-        <p style="color: #7f8c8d;">Sistema centralizado para la gestión de Trámites Version 5.6</p>
+        <p style="color: #7f8c8d;">Sistema centralizado para la gestión de Trámites Version 5.7</p>
         
         <!-- Botones para alternar entre Vistas -->
         <div style="margin-top: 20px;">
@@ -255,19 +255,23 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
                 // FILTRO DE COLISIONES PREVENTIVO: Calcula los slots libres de 15 minutos en red
-        async function actualizarHorariosDisponibles() {
+                async function actualizarHorariosDisponibles() {
             const fechaSeleccionada = document.getElementById('fecha').value;
             const selectHora = document.getElementById('hora');
             selectHora.innerHTML = '<option value="" disabled selected>Cargando horarios...</option>';
 
             if (!fechaSeleccionada) return;
 
-            // CORRECCIÓN CRÍTICA: Separar la fecha correctamente
-            const partesFecha = fechaSeleccionada.split('-'); // Resultado: [AAAA, MM, DD]
-            if (partesFecha.length !== 3) return;
+            // Separar la fecha de manera segura con variables limpias
+            const partes = fechaSeleccionada.split('-'); 
+            if (partes.length !== 3) return;
 
-            // Validar Fin de Semana (Sábado = 6, Domingo = 0)
-            const objetoFecha = new Date(partesFecha[0], partesFecha[1] - 1, partesFecha[2]);
+            const anio = parseInt(partes[0], 10);
+            const mes = parseInt(partes[1], 10) - 1; 
+            const dia = parseInt(partes[2], 10);
+
+            // Validar Fin de Semana de forma segura
+            const objetoFecha = new Date(anio, mes, dia);
             const diaDeLaSemana = objetoFecha.getDay(); 
             if (diaDeLaSemana === 0 || diaDeLaSemana === 6) {
                 alert("❌ El Registro Civil no atiende fines de semana. Por favor elija un día hábil.");
@@ -277,7 +281,7 @@
             }
 
             // Validar Feriado Nacional (Formato MM-DD)
-            const mesDia = `${partesFecha[1]}-${partesFecha[2]}`;
+            const mesDia = `${partes[1]}-${partes[2]}`;
             if (FERIADOS_NACIONALES.includes(mesDia)) {
                 alert("❌ La fecha seleccionada corresponde a un feriado nacional. Oficina cerrada.");
                 selectHora.innerHTML = '<option value="" disabled selected>Feriado Nacional</option>';
@@ -290,14 +294,12 @@
                 if (!res.ok) throw new Error();
                 const todosLosTurnos = await res.json();
                 
-                // Filtrar las horas reservadas para esa fecha específica
                 const horasOcupadas = todosLosTurnos
                     .filter(t => t.fecha === fechaSeleccionada)
                     .map(t => t.hora);
 
                 selectHora.innerHTML = '<option value="" disabled selected>Seleccione un horario</option>';
                 
-                // Rango operativo: de 07:30 a 12:00 hs en bloques de 15 minutos
                 let inicioMinutos = 7 * 60 + 30; // 07:30 hs
                 const finMinutos = 12 * 60; // 12:00 hs
 
@@ -323,7 +325,6 @@
                 }
 
             } catch (err) {
-                console.error("Error al conectar con la API:", err);
                 selectHora.innerHTML = '<option value="" disabled selected>Error de red local</option>';
             }
         }
