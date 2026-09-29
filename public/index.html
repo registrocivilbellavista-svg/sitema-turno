@@ -9,7 +9,7 @@
 
     <header style="text-align: center; margin-bottom: 30px;">
         <h1 style="color: #2c3e50;">🏛️ Turnos - Registro Civil Bella Vista</h1>
-        <p style="color: #7f8c8d;">Sistema centralizado para la gestión de Trámites Version 2.8</p>
+        <p style="color: #7f8c8d;">Sistema centralizado para la gestión de Trámites Version 3.0</p>
         
         <!-- Botones para alternar entre Vistas -->
         <div style="margin-top: 20px;">
@@ -428,15 +428,35 @@
                 });
 
                 if (res.ok) {
+                    // Cargar datos reales en la constancia de pantalla
                     document.getElementById('constancia-codigo').innerText = codigoTramite;
                     document.getElementById('constancia-tramite').innerText = turno.tramite;
                     document.getElementById('constancia-nombre').innerText = turno.paciente;
                     document.getElementById('constancia-registro').innerText = momentoRegistroTexto;
                     
                     const [aa, mm, dd] = fechaSeleccionada.split('-');
-                    document.getElementById('constancia-agenda').innerText = `${dd}/${mm}/${aa} a las ${horaSeleccionada} hs`;
+                    const agendaTexto = `${dd}/${mm}/${aa} a las ${horaSeleccionada} hs`;
+                    document.getElementById('constancia-agenda').innerText = `${agendaTexto}`;
 
+                    // PREPARACIÓN INMEDIATA DEL MENSAJE DE WHATSAPP
+                    let textoMensaje = "🏛️ *COMPROBANTE DE TURNO*\n";
+                    textoMensaje += "*Registro Civil Bella Vista*\n\n";
+                    textoMensaje += "¡Hola, *" + turno.paciente + "*! Tu turno fue procesado con éxito:\n\n";
+                    textoMensaje += "🔑 *Código de Turno:* " + codigoTramite + "\n";
+                    textoMensaje += "📄 *Tipo de Trámite:* " + turno.tramite + "\n";
+                    textoMensaje += "📅 *Fecha y Hora:* " + agendaTexto + "\n\n";
+                    textoMensaje += "📍 *Dirección:* Salta 150, Bella Vista\n";
+                    textoMensaje += "📝 _Comprobante emitido el " + momentoRegistroTexto + "_\n\n";
+                    textoMensaje += "⚠️ *Importante:* Por favor, guardá este mensaje y presentalo al ingresar a la oficina.";
+
+                    // Codificación estricta e inyección directa en el atributo href del enlace
+                    const mensajeCodificado = encodeURIComponent(textoMensaje);
+                    document.getElementById('enlace-whatsapp').href = "https://whatsapp.com" + mensajeCodificado;
+
+                    // Mostrar la ventana del comprobante de 25x25 cm automáticamente
                     document.getElementById('modal-comprobante').style.display = 'flex';
+
+                    // Resetear el formulario público
                     document.getElementById('form-turno').reset();
                     document.getElementById('hora').innerHTML = '<option value="" disabled selected>Elija primero una fecha</option>';
                     if(esEncargadoAutenticado) cargarTurnos();
