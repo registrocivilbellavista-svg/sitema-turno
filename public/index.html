@@ -9,7 +9,7 @@
 
     <header style="text-align: center; margin-bottom: 30px;">
         <h1 style="color: #2c3e50;">🏛️ Turnos - Registro Civil Bella Vista</h1>
-        <p style="color: #7f8c8d;">Sistema centralizado para la gestión de Trámites Version 5.5</p>
+        <p style="color: #7f8c8d;">Sistema centralizado para la gestión de Trámites Version 5.6</p>
         
         <!-- Botones para alternar entre Vistas -->
         <div style="margin-top: 20px;">
@@ -254,14 +254,19 @@
             mostrarVista('carga');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-                async function actualizarHorariosDisponibles() {
+                // FILTRO DE COLISIONES PREVENTIVO: Calcula los slots libres de 15 minutos en red
+        async function actualizarHorariosDisponibles() {
             const fechaSeleccionada = document.getElementById('fecha').value;
             const selectHora = document.getElementById('hora');
             selectHora.innerHTML = '<option value="" disabled selected>Cargando horarios...</option>';
 
             if (!fechaSeleccionada) return;
 
-            const partesFecha = fechaSeleccionada.split('-');
+            // CORRECCIÓN CRÍTICA: Separar la fecha correctamente
+            const partesFecha = fechaSeleccionada.split('-'); // Resultado: [AAAA, MM, DD]
+            if (partesFecha.length !== 3) return;
+
+            // Validar Fin de Semana (Sábado = 6, Domingo = 0)
             const objetoFecha = new Date(partesFecha[0], partesFecha[1] - 1, partesFecha[2]);
             const diaDeLaSemana = objetoFecha.getDay(); 
             if (diaDeLaSemana === 0 || diaDeLaSemana === 6) {
@@ -271,6 +276,7 @@
                 return;
             }
 
+            // Validar Feriado Nacional (Formato MM-DD)
             const mesDia = `${partesFecha[1]}-${partesFecha[2]}`;
             if (FERIADOS_NACIONALES.includes(mesDia)) {
                 alert("❌ La fecha seleccionada corresponde a un feriado nacional. Oficina cerrada.");
@@ -284,14 +290,16 @@
                 if (!res.ok) throw new Error();
                 const todosLosTurnos = await res.json();
                 
+                // Filtrar las horas reservadas para esa fecha específica
                 const horasOcupadas = todosLosTurnos
                     .filter(t => t.fecha === fechaSeleccionada)
                     .map(t => t.hora);
 
                 selectHora.innerHTML = '<option value="" disabled selected>Seleccione un horario</option>';
                 
-                let inicioMinutos = 7 * 60 + 30; 
-                const finMinutos = 12 * 60; 
+                // Rango operativo: de 07:30 a 12:00 hs en bloques de 15 minutos
+                let inicioMinutos = 7 * 60 + 30; // 07:30 hs
+                const finMinutos = 12 * 60; // 12:00 hs
 
                 let slotsDisponibles = 0;
 
@@ -315,6 +323,7 @@
                 }
 
             } catch (err) {
+                console.error("Error al conectar con la API:", err);
                 selectHora.innerHTML = '<option value="" disabled selected>Error de red local</option>';
             }
         }
