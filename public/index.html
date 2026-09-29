@@ -9,7 +9,7 @@
 
     <header style="text-align: center; margin-bottom: 30px;">
         <h1 style="color: #2c3e50;">🏛️ Turnos - Registro Civil Bella Vista</h1>
-        <p style="color: #7f8c8d;">Sistema centralizado para la gestión de Trámites Version 5</p>
+        <p style="color: #7f8c8d;">Sistema centralizado para la gestión de Trámites Version 5.1</p>
         
         <!-- Botones para alternar entre Vistas -->
         <div style="margin-top: 20px;">
@@ -582,12 +582,7 @@
             link.download = `agenda_turnos_${fechaSeleccionada}.xls`;
             link.click();
             URL.revokeObjectURL(link.href);
-        }
-        // ... ACÁ TERMINAN TUS FUNCIONES ANTERIORES (como marcarComoAtendido, guardarTurno, etc.)
-
-        // ==========================================
-        // ¡PEGÁ LA FUNCIÓN REIMPRIMIR ACÁ ADENTRO!
-        // ==========================================
+        
         function reimprimirTicketCorto(codigo, tramite, ciudadano, fecha, hora, emision) {
             const partesF = fecha.split('-');
             const fechaFormateada = partesF.length === 3 ? `${partesF[2]}/${partesF[1]}/${partesF[0]}` : fecha;
