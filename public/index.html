@@ -9,7 +9,7 @@
 
     <header style="text-align: center; margin-bottom: 30px;">
         <h1 style="color: #2c3e50;">🏛️ Turnos - Registro Civil Bella Vista</h1>
-        <p style="color: #7f8c8d;">Sistema centralizado para la gestión de Trámites Version 3.0</p>
+        <p style="color: #7f8c8d;">Sistema centralizado para la gestión de Trámites Version 3.1</p>
         
         <!-- Botones para alternar entre Vistas -->
         <div style="margin-top: 20px;">
@@ -113,10 +113,11 @@
                     <button onclick="imprimirConstanciaLocal()" style="flex: 1; background: #2ecc71; color: white; border: none; padding: 12px 5px; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 2px 4px rgba(46,204,113,0.2);">
                         🖨️ Imprimir / PDF
                     </button>
-                                        <!-- Reemplazo del botón por un enlace nativo directo que el navegador no bloquea -->
-                    <a id="enlace-whatsapp" target="_blank" style="flex: 1; background: #00e676; color: white; border: none; padding: 12px 5px; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 4px; text-decoration: none; box-shadow: 0 2px 4px rgba(0,230,118,0.2);">
+                                            <!-- Botón de WhatsApp corregido con la función definitiva -->
+                    <button onclick="enviarMensajeWhatsAppDirecto()" style="flex: 1; background: #00e676; color: white; border: none; padding: 12px 5px; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,230,118,0.2);">
                         💬 Enviar por WhatsApp
-                    </a>
+                    </button>
+
                 </div>
                 <div style="display: flex; gap: 10px;">
                     <button onclick="cerrarConstancia()" style="flex: 1.2; background: #3498db; color: white; border: none; padding: 10px 5px; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 4px;">
@@ -528,33 +529,31 @@
             ventanaImpresion.document.close();
         }
 
-               function enviarPorWhatsApp() {
-            // Capturar los datos cargados actualmente en la constancia de pantalla
+            function enviarMensajeWhatsAppDirecto() {
+            // Leer los datos reales que están escritos en la pantalla en ese momento
             const codigo = document.getElementById('constancia-codigo').innerText;
             const tramite = document.getElementById('constancia-tramite').innerText;
             const ciudadano = document.getElementById('constancia-nombre').innerText;
             const agenda = document.getElementById('constancia-agenda').innerText;
             const emision = document.getElementById('constancia-registro').innerText;
 
-            // Armamos el texto en una sola línea usando \n para los saltos de forma limpia
-            let textoMensaje = "🏛️ *COMPROBANTE DE TURNO*\n";
-            textoMensaje += "*Registro Civil Bella Vista*\n\n";
-            textoMensaje += "¡Hola, *" + ciudadano + "*! Tu turno fue procesado con éxito:\n\n";
-            textoMensaje += "🔑 *Código de Turno:* " + codigo + "\n";
-            textoMensaje += "📄 *Tipo de Trámite:* " + tramite + "\n";
-            textoMensaje += "📅 *Fecha y Hora:* " + agenda + "\n\n";
-            textoMensaje += "📍 *Dirección:* Salta 150, Bella Vista\n";
-            textoMensaje += "📝 _Comprobante emitido el " + emision + "_\n\n";
-            textoMensaje += "⚠️ *Importante:* Por favor, guardá este mensaje y presentalo al ingresar a la oficina.";
+            // Redactar el mensaje con formato prolijo
+            let texto = "🏛️ *COMPROBANTE DE TURNO*\n";
+            texto += "*Registro Civil Bella Vista*\n\n";
+            texto += "¡Hola, *" + ciudadano + "*! Tu turno fue procesado con éxito:\n\n";
+            texto += "🔑 *Código de Turno:* " + codigo + "\n";
+            texto += "📄 *Tipo de Trámite:* " + tramite + "\n";
+            texto += "📅 *Fecha y Hora:* " + agenda + "\n\n";
+            texto += "📍 *Dirección:* Salta 150, Bella Vista\n";
+            texto += "📝 _Comprobante emitido el " + emision + "_\n\n";
+            texto += "⚠️ *Importante:* Por favor, guardá este mensaje y presentalo al ingresar a la oficina.";
 
-            // Forzar codificación global de caracteres y símbolos especiales
-            const textoLimpioCodificado = encodeURIComponent(textoMensaje);
+            // Codificar el texto de forma segura para la web
+            const textoCodificado = encodeURIComponent(texto);
             
-            // Usamos el enlace universal oficial que redirige correctamente en cualquier dispositivo
-            const urlWhatsAppOficial = "https://wa.me" + textoLimpioCodificado;
-            
-            // Abrir en pestaña nueva de forma segura
-            window.open(urlWhatsAppOficial, '_blank');
+            // Abrir WhatsApp Web o la App directamente forzando la apertura de la ventana
+            const urlFinal = "https://whatsapp.com" + textoCodificado;
+            window.open(urlFinal, '_blank');
         }
 
         function exportarAgendaAExcel() {
