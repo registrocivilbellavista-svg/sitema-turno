@@ -9,7 +9,7 @@
 
     <header style="text-align: center; margin-bottom: 30px;">
         <h1 style="color: #2c3e50;">🏛️ Turnos - Registro Civil Bella Vista</h1>
-        <p style="color: #7f8c8d;">Sistema centralizado para la gestión de Trámites Version 3.2</p>
+        <p style="color: #7f8c8d;">Sistema centralizado para la gestión de Trámites Version 3.5</p>
         
         <!-- Botones para alternar entre Vistas -->
         <div style="margin-top: 20px;">
@@ -182,10 +182,12 @@
         </div>
     </main>
     <script>
+        // CONFIGURACIÓN: Forzamos la dirección al servidor local Node.js
         const API_URL = window.location.origin;
         let esEncargadoAutenticado = false;
         const CLAVE_ENCARGADOS = "bella123"; 
 
+        // Listado de feriados oficiales de Argentina (Formato MM-DD)
         const FERIADOS_NACIONALES = [
             "01-01", "02-16", "02-17", "03-23", "03-24", "04-02", "04-03", 
             "05-01", "05-25", "06-15", "06-20", "07-09", "07-10", "08-17", 
@@ -252,7 +254,7 @@
             mostrarVista('carga');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-        async function actualizarHorariosDisponibles() {
+                async function actualizarHorariosDisponibles() {
             const fechaSeleccionada = document.getElementById('fecha').value;
             const selectHora = document.getElementById('hora');
             selectHora.innerHTML = '<option value="" disabled selected>Cargando horarios...</option>';
@@ -260,7 +262,7 @@
             if (!fechaSeleccionada) return;
 
             const partesFecha = fechaSeleccionada.split('-');
-            const objetoFecha = new Date(partesFecha, partesFecha - 1, partesFecha);
+            const objetoFecha = new Date(partesFecha[0], partesFecha[1] - 1, partesFecha[2]);
             const diaDeLaSemana = objetoFecha.getDay(); 
             if (diaDeLaSemana === 0 || diaDeLaSemana === 6) {
                 alert("❌ El Registro Civil no atiende fines de semana. Por favor elija un día hábil.");
@@ -269,7 +271,7 @@
                 return;
             }
 
-            const mesDia = `${partesFecha}-${partesFecha}`;
+            const mesDia = `${partesFecha[1]}-${partesFecha[2]}`;
             if (FERIADOS_NACIONALES.includes(mesDia)) {
                 alert("❌ La fecha seleccionada corresponde a un feriado nacional. Oficina cerrada.");
                 selectHora.innerHTML = '<option value="" disabled selected>Feriado Nacional</option>';
@@ -316,6 +318,7 @@
                 selectHora.innerHTML = '<option value="" disabled selected>Error de red local</option>';
             }
         }
+
         async function cargarTurnos() {
             if (!esEncargadoAutenticado) return;
             try {
@@ -327,7 +330,7 @@
                 
                 const fechaSeleccionada = document.getElementById('filtro-fecha-panel').value;
                 const partesFecha = fechaSeleccionada.split('-');
-                const fechaFormateadaTitulo = partesFecha.length === 3 ? `${partesFecha}/${partesFecha}/${partesFecha}` : fechaSeleccionada;
+                const fechaFormateadaTitulo = partesFecha.length === 3 ? `${partesFecha[2]}/${partesFecha[1]}/${partesFecha[0]}` : fechaSeleccionada;
                 document.getElementById('titulo-cronograma').innerText = `📅 Agenda del Día: ${fechaFormateadaTitulo}`;
 
                 const turnosFiltrados = todosLosTurnos.filter(t => t.fecha === fechaSeleccionada);
@@ -391,6 +394,7 @@
                 alert("Error de conexión al marcar como atendido.");
             }
         }
+
         async function guardarTurno(e) {
             e.preventDefault();
             const btnSubmit = e.target.querySelector('button[type="submit"]');
@@ -428,35 +432,15 @@
                 });
 
                 if (res.ok) {
-                    // Cargar datos reales en la constancia de pantalla
                     document.getElementById('constancia-codigo').innerText = codigoTramite;
                     document.getElementById('constancia-tramite').innerText = turno.tramite;
                     document.getElementById('constancia-nombre').innerText = turno.paciente;
                     document.getElementById('constancia-registro').innerText = momentoRegistroTexto;
                     
-                    const [aa, mm, dd] = fechaSeleccionada.split('-');
-                    const agendaTexto = `${dd}/${mm}/${aa} a las ${horaSeleccionada} hs`;
-                    document.getElementById('constancia-agenda').innerText = `${agendaTexto}`;
+                    const partesF = fechaSeleccionada.split('-');
+                    document.getElementById('constancia-agenda').innerText = `${partesF[2]}/${partesF[1]}/${partesF[0]} a las ${horaSeleccionada} hs`;
 
-                    // PREPARACIÓN INMEDIATA DEL MENSAJE DE WHATSAPP
-                    let textoMensaje = "🏛️ *COMPROBANTE DE TURNO*\n";
-                    textoMensaje += "*Registro Civil Bella Vista*\n\n";
-                    textoMensaje += "¡Hola, *" + turno.paciente + "*! Tu turno fue procesado con éxito:\n\n";
-                    textoMensaje += "🔑 *Código de Turno:* " + codigoTramite + "\n";
-                    textoMensaje += "📄 *Tipo de Trámite:* " + turno.tramite + "\n";
-                    textoMensaje += "📅 *Fecha y Hora:* " + agendaTexto + "\n\n";
-                    textoMensaje += "📍 *Dirección:* Salta 150, Bella Vista\n";
-                    textoMensaje += "📝 _Comprobante emitido el " + momentoRegistroTexto + "_\n\n";
-                    textoMensaje += "⚠️ *Importante:* Por favor, guardá este mensaje y presentalo al ingresar a la oficina.";
-
-                    // Codificación estricta e inyección directa en el atributo href del enlace
-                    const mensajeCodificado = encodeURIComponent(textoMensaje);
-                    document.getElementById('enlace-whatsapp').href = "https://whatsapp.com" + mensajeCodificado;
-
-                    // Mostrar la ventana del comprobante de 25x25 cm automáticamente
                     document.getElementById('modal-comprobante').style.display = 'flex';
-
-                    // Resetear el formulario público
                     document.getElementById('form-turno').reset();
                     document.getElementById('hora').innerHTML = '<option value="" disabled selected>Elija primero una fecha</option>';
                     if(esEncargadoAutenticado) cargarTurnos();
@@ -464,7 +448,7 @@
                     alert("El servidor rechazó la reserva.");
                 }
             } catch (err) {
-                alert("Error de conexión al procesar el turno.");
+                alert("Error de conexión al procesar el turno. Verifique que el servidor Node.js esté encendido.");
             } finally {
                 btnSubmit.disabled = false;
             }
@@ -482,7 +466,8 @@
                 }
             }
         }
-               function imprimirConstanciaLocal() {
+
+        function imprimirConstanciaLocal() {
             const contenido = document.getElementById('area-impresion').innerHTML;
             const ventanaImpresion = window.open('', '_blank', 'height=700,width=700');
             const etiquetaCierreScript = '</' + 'script>';
@@ -492,24 +477,8 @@
                 <head>
                     <title>Comprobante de Turno - Registro Civil Bella Vista</title>
                     <style>
-                        /* Restricciones estrictas únicamente para la impresora física o virtual PDF */
-                        @page { 
-                            size: 25cm 25cm; 
-                            margin: 0; 
-                        }
-                        body { 
-                            font-family: system-ui, sans-serif; 
-                            margin: 0; 
-                            padding: 2.5cm; 
-                            width: 25cm; 
-                            height: 25cm; 
-                            box-sizing: border-box; 
-                            color: #2c3e50; 
-                            display: flex; 
-                            flex-direction: column; 
-                            justify-content: center; 
-                            text-align: center; 
-                        }
+                        @page { size: 25cm 25cm; margin: 0; }
+                        body { font-family: system-ui, sans-serif; margin: 0; padding: 2.5cm; width: 25cm; height: 25cm; box-sizing: border-box; color: #2c3e50; display: flex; flex-direction: column; justify-content: center; text-align: center; }
                     </style>
                 </head>
                 <body>
@@ -528,31 +497,26 @@
             ventanaImpresion.document.close();
         }
 
-            function enviarMensajeWhatsAppDirecto() {
-            // Leer los datos reales que están escritos en la pantalla en ese momento
+        function enviarPorWhatsApp() {
             const codigo = document.getElementById('constancia-codigo').innerText;
             const tramite = document.getElementById('constancia-tramite').innerText;
             const ciudadano = document.getElementById('constancia-nombre').innerText;
             const agenda = document.getElementById('constancia-agenda').innerText;
             const emision = document.getElementById('constancia-registro').innerText;
 
-            // Redactar el mensaje con formato prolijo
-            let texto = "🏛️ *COMPROBANTE DE TURNO*\n";
-            texto += "*Registro Civil Bella Vista*\n\n";
-            texto += "¡Hola, *" + ciudadano + "*! Tu turno fue procesado con éxito:\n\n";
-            texto += "🔑 *Código de Turno:* " + codigo + "\n";
-            texto += "📄 *Tipo de Trámite:* " + tramite + "\n";
-            texto += "📅 *Fecha y Hora:* " + agenda + "\n\n";
-            texto += "📍 *Dirección:* Salta 150, Bella Vista\n";
-            texto += "📝 _Comprobante emitido el " + emision + "_\n\n";
-            texto += "⚠️ *Importante:* Por favor, guardá este mensaje y presentalo al ingresar a la oficina.";
+            const mensajeOriginal = 
+                `🏛️ *COMPROBANTE DE TURNO*\n` +
+                `*Registro Civil Bella Vista*\n\n` +
+                `¡Hola, *${ciudadano}*! Tu turno fue procesado con éxito:\n\n` +
+                `🔑 *Código de Turno:* ${codigo}\n` +
+                `📄 *Tipo de Trámite:* ${tramite}\n` +
+                `📅 *Fecha y Hora:* ${agenda}\n\n` +
+                `📍 *Dirección:* Salta 150, Bella Vista\n` +
+                `📝 _Comprobante emitido el ${emision}_\n\n` +
+                `⚠️ *Importante:* Por favor, guardá este mensaje y presentalo al ingresar a la oficina.`;
 
-            // Codificar el texto de forma segura para la web
-            const textoCodificado = encodeURIComponent(texto);
-            
-            // Abrir WhatsApp Web o la App directamente forzando la apertura de la ventana
-            const urlFinal = "https://whatsapp.com" + textoCodificado;
-            window.open(urlFinal, '_blank');
+            const urlWhatsApp = "https://whatsapp.com" + encodeURIComponent(mensajeOriginal);
+            window.open(urlWhatsApp, '_blank');
         }
 
         function exportarAgendaAExcel() {
@@ -562,47 +526,21 @@
                 return;
             }
             const fechaSeleccionada = document.getElementById('filtro-fecha-panel').value;
-            
-            let htmlTabla = `
-                <table border="1">
-                    <thead>
-                        <tr style="background-color: #27ae60; color: white; font-weight: bold;">
-                            <th>Horario</th>
-                            <th>Código</th>
-                            <th>Trámite</th>
-                            <th>Ciudadano</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
+            let htmlTabla = `<table border="1"><thead><tr style="background-color: #27ae60; color: white; font-weight: bold;"><th>Horario</th><th>Código</th><th>Trámite</th><th>Ciudadano</th><th>Estado</th></tr></thead><tbody>`;
             
             Array.from(contenedor.children).forEach(el => {
                 if (!el.innerText.includes("Horario asignado")) return;
-                
                 const tramite = el.querySelector('span') ? el.querySelector('span').innerText : 'General';
                 const codMatch = el.innerText.match(/COD:\s*(RC\d+)/);
-                const cod = (codMatch && codMatch[1]) ? codMatch[1] : 'N/A';
-                
+                const cod = codMatch ? codMatch[1] : 'N/A';
                 const nombre = el.querySelector('strong') ? el.querySelector('strong').innerText : 'N/C';
                 const horaMatch = el.innerText.match(/Horario asignado:\s*([^\s\n]+)/);
-                const hora = (horaMatch && horaMatch[1]) ? horaMatch[1] : 'N/A';
-                
+                const hora = horaMatch ? horaMatch[1] : 'N/A';
                 const est = el.innerText.includes("✅ ATENDIDO") ? "Atendido" : "Pendiente";
-                
-                htmlTabla += `
-                    <tr>
-                        <td>${hora} hs</td>
-                        <td>${cod}</td>
-                        <td>${tramite}</td>
-                        <td>${nombre}</td>
-                        <td>${est}</td>
-                    </tr>
-                `;
+                htmlTabla += `<tr><td>${hora} hs</td><td>${cod}</td><td>${tramite}</td><td>${nombre}</td><td>${est}</td></tr>`;
             });
 
             htmlTabla += `</tbody></table>`;
-            
             const blob = new Blob([htmlTabla], { type: 'application/vnd.ms-excel' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -611,7 +549,6 @@
             URL.revokeObjectURL(link.href);
         }
 
-        // Refresco automático asíncrono en red cada 3 segundos
         setInterval(() => {
             if (typeof esEncargadoAutenticado !== 'undefined' && esEncargadoAutenticado) {
                 cargarTurnos();
