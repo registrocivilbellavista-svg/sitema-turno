@@ -9,7 +9,7 @@
 
     <header style="text-align: center; margin-bottom: 30px;">
         <h1 style="color: #2c3e50;">🏛️ Turnos - Registro Civil Bella Vista</h1>
-        <p style="color: #7f8c8d;">Sistema centralizado para la gestión de Trámites Version 3.5</p>
+        <p style="color: #7f8c8d;">Sistema centralizado para la gestión de Trámites Version 4.0</p>
         
         <!-- Botones para alternar entre Vistas -->
         <div style="margin-top: 20px;">
@@ -114,7 +114,7 @@
                         🖨️ Imprimir / PDF
                     </button>
                  <!-- Botón de WhatsApp corregido con la función definitiva -->
-                    <button onclick="enviarMensajeWhatsAppDirecto()" style="flex: 1; background: #00e676; color: white; border: none; padding: 12px 5px; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,230,118,0.2);">
+                    <button onclick="enviarPorWhatsApp()" style="flex: 1; background: #00e676; color: white; border: none; padding: 12px 5px; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,230,118,0.2);">
                         💬 Enviar por WhatsApp
                     </button>
                 </div>
@@ -497,27 +497,52 @@
             ventanaImpresion.document.close();
         }
 
-        function enviarPorWhatsApp() {
+            function enviarPorWhatsApp() {
+            // Capturar de manera estricta los datos impresos en la constancia de la pantalla
             const codigo = document.getElementById('constancia-codigo').innerText;
             const tramite = document.getElementById('constancia-tramite').innerText;
             const ciudadano = document.getElementById('constancia-nombre').innerText;
             const agenda = document.getElementById('constancia-agenda').innerText;
             const emision = document.getElementById('constancia-registro').innerText;
 
-            const mensajeOriginal = 
-                `🏛️ *COMPROBANTE DE TURNO*\n` +
-                `*Registro Civil Bella Vista*\n\n` +
-                `¡Hola, *${ciudadano}*! Tu turno fue procesado con éxito:\n\n` +
-                `🔑 *Código de Turno:* ${codigo}\n` +
-                `📄 *Tipo de Trámite:* ${tramite}\n` +
-                `📅 *Fecha y Hora:* ${agenda}\n\n` +
-                `📍 *Dirección:* Salta 150, Bella Vista\n` +
-                `📝 _Comprobante emitido el ${emision}_\n\n` +
-                `⚠️ *Importante:* Por favor, guardá este mensaje y presentalo al ingresar a la oficina.`;
+            // Construcción lineal limpia del mensaje institucional para evitar roturas de URL
+            let textoMensaje = "臨 *COMPROBANTE DE TURNO*\n";
+            textoMensaje += "*Registro Civil Bella Vista*\n\n";
+            textoMensaje += "隆Hola, *" + ciudadano + "*! Tu turno fue procesado con _茅xito_:\n\n";
+            textoMensaje += "冒 *C贸digo de Turno:* " + codigo + "\n";
+            textoMensaje += "冒 *Tipo de Tr谩mite:* " + tramite + "\n";
+            textoMensaje += "冒 *Fecha y Hora:* " + agenda + "\n\n";
+            textoMensaje += "冒 *Direcci贸n:* Salta 150, Bella Vista\n";
+            textoMensaje += "艙 _Comprobante emitido el " + emision + "_\n\n";
+            textoMensaje += "盧 *Importante:* Por favor, guard谩 este mensaje y presentalo al ingresar a la oficina.";
 
-            const urlWhatsApp = "https://whatsapp.com" + encodeURIComponent(mensajeOriginal);
-            window.open(urlWhatsApp, '_blank');
+            // Codificar el texto para que los espacios y símbolos sean válidos en la web
+            const textoCodificado = encodeURIComponent(textoMensaje);
+            
+            // MOTOR INTELIGENTE: Detectar si el usuario está en un celular o una computadora
+            const esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            let urlDestinoFinal = "";
+            if (esMovil) {
+                // Enlace nativo que obliga al celular a saltar directo a la Aplicación de WhatsApp
+                urlDestinoFinal = "whatsapp://send?text=" + textoCodificado;
+            } else {
+                // Enlace universal de wa.me que fuerza la redirección o abre WhatsApp Web en PC
+                urlDestinoFinal = "https://wa.me" + textoCodificado;
+            }
+
+            // Crear un elemento invisible temporal para saltear de forma definitiva el bloqueo de ventanas (Pop-ups)
+            const disparadorNativo = document.createElement('a');
+            disparadorNativo.href = urlDestinoFinal;
+            disparadorNativo.target = '_blank';
+            disparadorNativo.rel = 'noopener noreferrer';
+            
+            // Forzar el clic nativo del sistema
+            document.body.appendChild(disparadorNativo);
+            disparadorNativo.click();
+            document.body.removeChild(disparadorNativo);
         }
+
 
         function exportarAgendaAExcel() {
             const contenedor = document.getElementById('lista-turnos');
