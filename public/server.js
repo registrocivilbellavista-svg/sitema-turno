@@ -4,6 +4,7 @@ const cors = require('cors');
 
 const app = express();
 app.use(express.json());
+app.use(express.static('public'));
 app.use(cors()); // Permite que tu HTML se comunique con Render
 
 // 1. CONEXIÓN A LA BASE DE DATOS (Usa la variable de entorno de Render)
