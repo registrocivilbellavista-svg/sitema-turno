@@ -7,7 +7,7 @@ app.use(express.json());
 app.use(cors()); // Permite que tu HTML se comunique con Render
 
 // 1. CONEXIÓN A LA BASE DE DATOS (Usa la variable de entorno de Render)
-const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://registrocivilbellavista_db_user:<db_password>@turnoregistro.gxj56bq.mongodb.net/";
+const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://registrocivilbellavista_db_user:xBY2kSqi7vYIQ5kf@turnoregistro.gxj56bq.mongodb.net/";
 
 mongoose.connect(MONGO_URI)
     .then(() => console.log("¡Conectado con éxito a MongoDB Atlas permanente!"))
