@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Buscador de Actas - Registro Civil</title>
+    
+    <!-- Librería de íconos Font Awesome 6 Premium Estables -->
+    <link rel="stylesheet" href="https://cloudflare.com">
+    
+    <style>
+        /* REGLAS PARA SIMULAR UNA APP NATIVA (MOBILE-FIRST) */
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f7fafc; 
+            color: #2d3748; 
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none; /* Evita selecciones accidentales al tocar la pantalla */
+        }
+
+        /* CONTENEDOR PRINCIPAL CON SCROLL INTERNO (EVITA REBOTE DE NAVEGADOR) */
+        .app-container {
+            flex-grow: 1;
+            padding: 20px;
+            padding-bottom: 90px; /* Espacio de resguardo para la botonera inferior */
+            box-sizing: border-box;
+            overflow-y: auto;
+            max-width: 600px; /* Centrado perfecto tipo app en tablets o pantallas grandes */
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* ENCABEZADO DE LA APP */
+        .app-header {
+            background-color: #1a365d; /* Azul Institucional Oscuro */
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+        }
+        .app-header i {
+            font-size: 32px;
+            color: #63b3ed; /* Azul cielo para destacar los íconos */
+            margin-bottom: 8px;
+        }
+        .app-header h1 {
+            font-size: 18px;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .app-header p {
+            font-size: 12px;
+            margin: 4px 0 0 0;
+            color: #a0aec0;
+        }
+
+        /* PANTALLAS (VISTAS INTERNAS DE LA APP) */
+        .app-screen {
+            display: none;
+            animation: fadeIn 0.25s ease-in-out;
+        }
+        .app-screen.active {
+            display: block;
+        }
+
+        /* TARJETAS FORMULARIOS Y RESULTADOS */
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            margin-top: 15px;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* ELEMENTOS DE FORMULARIO AGRANDADOS PARA PANTALLAS TÁCTILES */
+        label {
+            font-weight: 700;
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #4a5568;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        label i {
+            font-size: 16px;
+            color: #3182ce;
+            margin-right: 6px;
+        }
+        input[type="text"], input[type="number"], select, textarea {
+            width: 100%;
+            padding: 14px; /* Más alto para facilitar el toque digital */
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 15px;
+            background-color: #fff;
+            transition: all 0.2s ease;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #3182ce;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15);
+        }
+
+        /* BOTONES ESTILO NATIVO SMARTPHONE */
+        .btn {
+            background-color: #3182ce;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 20px;
+            box-shadow: 0 4px 10px rgba(49, 130, 206, 0.2);
+        }
+        .btn:active {
+            transform: scale(0.98);
+            background-color: #2b6cb0;
+        }
+        .btn-danger {
+            background-color: #e53e3e;
+            box-shadow: 0 4px 10px rgba(229, 62, 62, 0.2);
+        }
+        .btn-danger:active { background-color: #c53030; }
+        
+        .btn-secondary {
+            background-color: #718096;
+            box-shadow: 0 4px 10px rgba(113, 128, 150, 0.2);
+        }
+        .btn-secondary:active { background-color: #4a5568; }
+
+        /* TARJETAS DE RESULTADOS EN BÚSQUEDA (CIUDADANOS) */
+        .result-item {
+            background: white;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid #e2e8f0;
+            border-left: 6px solid #4a5568; /* Gris por defecto */
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            position: relative;
+        }
+        /* Bordes de color según la empresa cochería para identificarlos visualmente rápido */
+        .result-item.bouchard { border-left-color: #3182ce; }   /* Azul Bouchard */
+        .result-item.cossani { border-left-color: #38a169; }    /* Verde Cossani */
+        .result-item.previsora { border-left-color: #d69e2e; }  /* Dorado Previsora */
+
+        .result-item h3 {
+            margin: 0;
+            font-size: 16px;
+            color: #1a202c;
+            text-transform: uppercase;
+        }
+        .result-item p {
+            margin: 2px 0;
+            font-size: 13.5px;
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .result-item p i {
+            width: 16px;
+            text-align: center;
+            color: #718096;
+            font-size: 14px;
+        }
+
+        /* Botón de acceso directo a Drive en la tarjeta */
+        .btn-drive-link {
+            background-color: #ffc107;
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            width: fit-content;
+            margin-top: 8px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+        }
+        .btn-drive-link i {
+            font-size: 15px;
+            color: #fff;
+        }
+
+        .actions-area {
+            display: flex;
+            gap: 6px;
+            justify-content: flex-end;
+            margin-top: 10px;
+            border-top: 1px solid #edf2f7;
+            padding-top: 10px;
+        }
+        .btn-mini {
+            padding: 6px 10px;
+            font-size: 12px;
+            min-width: auto;
+            width: auto;
+            margin: 0;
+        }
+
+        /* BOTONERA INFERIOR (ESTILO APP NATIVA FLOTANTE) */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background-color: #ffffff;
+            height: 70px;
+            display: flex;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.06);
+            border-top: 1px solid #edf2f7;
+            z-index: 1000;
+        }
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #718096;
+            font-size: 11px;
+            font-weight: bold;
+            text-decoration: none;
+            gap: 4px;
+            cursor: pointer;
+            transition: color 0.15s;
+        }
+        .nav-item i {
+            font-size: 20px;
+        }
+        .nav-item.active {
+            color: #3182ce;
+        }
+
+        /* EFECTO DE ANIMACIÓN SUAVE PARA PASAR PANTALLAS */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-header">
+    <i class="fa-solid fa-box-archive"></i>
+    <h1>Archivo de Defunciones</h1>
+    <p>Registro Civil • Bella Vista</p>
+</div>
+
+<div class="app-container">
+    
+    <!-- PANTALLA 1: BUSCADOR DE ACTAS -->
+    <div id="screenBuscar" class="app-screen active">
+        <label for="searchBar"><i class="fa-solid fa-magnifying-glass"></i> Buscar por DNI o Apellido/Nombre:</label>
+        <input type="text" id="searchBar" placeholder="Escribí para filtrar al instante..." oninput="buscarActas()">
+        
+        <div style="margin-top: 15px; display: flex; gap: 5px; overflow-x: auto; padding-bottom: 5px;">
+            <select id="filterCategoria" onchange="buscarActas()" style="padding: 10px; font-size: 13px; height: auto;">
+                <option value="todos">📁 Ver Todas las Cocherías</option>
+                <option value="bouchard">🔷 Cochería Bouchard</option>
+                <option value="cossani">🔶 Cochería Cossani</option>
+                <option value="previsora">🔶 Cochería Previsora</option>
+                <option value="general">📁 General / Otras Actas</option>
+            </select>
+        </div>
+
+        <div id="resultsCount" style="font-size: 12px; font-weight: bold; color: #718096; margin-top: 15px; text-transform: uppercase;">
+            Actas encontradas: 0
+        </div>
+
+        <div id="searchResultsContainer" style="margin-top: 10px;">
+            <!-- Las tarjetas de ciudadanos se inyectan dinámicamente con JavaScript -->
+        </div>
+    </div>
+
+    <!-- PANTALLA 2: CARGAR NUEVA ACTA -->
+    <div id="screenCargar" class="app-screen">
+        <div class="card">
+            <h2 style="margin-top:0; font-size: 16px; color: #1a365d; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-file-circle-plus" style="color:#3182ce;"></i> Registrar Acta Digitalizada
+            </h2>
+            
+            <input type="hidden" id="editIndex" value="-1">
+
+            <label for="actaDni"><i class="fa-solid fa-id-card"></i> N° de DNI del Fallecido:</label>
+            <input type="number" id="actaDni" placeholder="Ej: 14234567" required>
+
+            <label for="actaNombre"><i class="fa-solid fa-user"></i> Apellidos y Nombres:</label>
+            <input type="text" id="actaNombre" placeholder="Ej: PÉREZ JUAN CARLOS" required style="text-transform: uppercase;">
+
+            <label for="actaNumero"><i class="fa-solid fa-hashtag"></i> Número de Acta / Tomo / Folio:</label>
+            <input type="text" id="actaNumero" placeholder="Ej: Acta 12 - Tomo I - Folio 45">
+
+            <label for="actaAnio"><i class="fa-solid fa-calendar-days"></i> Año de la Defunción:</label>
+            <input type="number" id="actaAnio" placeholder="Ej: 2026" value="2026">
+
+            <label for="actaCategoria"><i class="fa-solid fa-building"></i> Clasificación / Cochería:</label>
+            <select id="actaCategoria">
+                <option value="general">General / Carpeta Raíz</option>
+                <option value="bouchard">BOUCHARD v03022026</option>
+                <option value="cossani">COSSANI v03022026</option>
+                <option value="previsora">PREVISORA v03022026</option>
+            </select>
+
+            <label for="actaDriveUrl"><i class="fa-solid fa-cloud"></i> Enlace de Archivo (Google Drive):</label>
+            <input type="text" id="actaDriveUrl" placeholder="Pegá el link para compartir de Drive aquí...">
+
+            <button class="btn" id="btnGuardar" onclick="guardarActa()">
+                <i class="fa-solid fa-floppy-disk"></i> Guardar Acta en Registro
+            </button>
+        </div>
+    </div>
+
+    <!-- PANTALLA 3: CONFIGURACIÓN Y RESPALDOS -->
+    <div id="screenConfig" class="app-screen">
+        <div class="card">
+            <h2 style="margin-top:0; font-size: 16px; color: #1a365d; text-transform: uppercase;">
+                <i class="fa-solid fa-shield-halved" style="color:#3182ce;"></i> Resguardo de Información
+            </h2>
+            <p style="font-size: 13px; color: #4a5568; line-height: 1.5;">
+                Toda la base de datos de actas se almacena de forma segura en la memoria interna de la aplicación. Utilizá los botones de abajo para generar copias de seguridad.
+            </p>
+            
+            <button class="btn btn-secondary" onclick="exportarBaseDatos()">
+                <i class="fa-solid fa-file-export"></i> Exportar Resguardo (JSON)
+            </button>
+            
+            <label for="importFile" style="background-color: #4a5568; color: white; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                <i class="fa-solid fa-file-import"></i> Importar Resguardo (JSON)
+            </label>
+            <input type="file" id="importFile" accept=".json" onchange="importarBaseDatos(event)" style="display: none;">
+        </div>
+
+        <div class="card" style="border-top: 4px solid #e53e3e;">
+            <h2 style="margin-top:0; font-size: 16px; color: #c53030; text-transform: uppercase;">
+                <i class="fa-solid fa-triangle-exclamation"></i> Zona de Peligro
+            </h2>
+            <p style="font-size: 13px; color: #4a5568;">
+                Esta acción borrará de manera definitiva todas las actas indexadas en la aplicación. Asegurate de tener una copia de resguardo.
+            </p>
+            <button class="btn btn-danger" onclick="eliminarTodaLaBase()">
+                <i class="fa-solid fa-trash-can"></i> Borrar Toda la Base de Datos
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<!-- BOTONERA INFERIOR FIJA (AL ALCANCE DEL PULGAR) -->
+<div class="bottom-nav">
+    <div id="navBuscar" class="nav-item active" onclick="switchScreen('screenBuscar', this)">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <span>Buscar</span>
+    </div>
+    <div id="navCargar" class="nav-item" onclick="switchScreen('screenCargar', this)">
+        <i class="fa-solid fa-file-circle-plus"></i>
+        <span>Cargar</span>
+    </div>
+    <div id="navConfig" class="nav-item" onclick="switchScreen('screenConfig', this)">
+        <i class="fa-solid fa-gears"></i>
+        <span>Resguardos</span>
+    </div>
+</div>
+<script>
+    // Inicialización de la Base de Datos Local persistente en el dispositivo
+    let baseActasDefuncion = JSON.parse(localStorage.getItem('base_actas_defunciones_rc')) || [];
+
+    // Función para alternar entre las vistas/pantallas de la aplicación (Efecto Nativo)
+    function switchScreen(screenId, navElement) {
+        // Ocultar todas las pantallas
+        document.getElementById('screenBuscar').style.display = 'none';
+        document.getElementById('screenCargar').style.display = 'none';
+        document.getElementById('screenConfig').style.display = 'none';
+
+        // Remover estado activo de los botones de navegación
+        document.getElementById('navBuscar').classList.remove('active');
+        document.getElementById('navCargar').classList.remove('active');
+        document.getElementById('navConfig').classList.remove('active');
+
+        // Mostrar pantalla seleccionada y activar su ícono
+        const targetScreen = document.getElementById(screenId);
+        if (targetScreen) targetScreen.style.display = 'block';
+        if (navElement) navElement.classList.add('active');
+
+        // Forzar renderizado o limpieza según corresponda
+        if (screenId === 'screenBuscar') {
+            buscarActas();
+        } else if (screenId === 'screenCargar' && parseInt(document.getElementById('editIndex').value) === -1) {
+            limpiarFormularioActas();
+        }
+    }
+
+    // Función principal para dar de alta o guardar modificaciones de un acta
+    function guardarActa() {
+        const dni = document.getElementById('actaDni').value.trim();
+        const nombre = document.getElementById('actaNombre').value.trim().toUpperCase();
+        const numero = document.getElementById('actaNumero').value.trim() || '-';
+        const anio = document.getElementById('actaAnio').value.trim() || '2026';
+        const categoria = document.getElementById('actaCategoria').value;
+        let driveUrl = document.getElementById('actaDriveUrl').value.trim();
+        const index = parseInt(document.getElementById('editIndex').value);
+
+        // Validación estricta de campos obligatorios para evitar registros vacíos
+        if (!dni || !nombre) {
+            alert('⚠️ Por favor complete el número de DNI y los Nombres/Apellidos del fallecido.');
+            return;
+        }
+
+        // Si no se asignó un enlace, redirigir al link base de la carpeta raíz provisto por el usuario
+        if (!driveUrl) {
+            driveUrl = "https://google.com";
+        }
+
+        const dataActa = {
+            dni: dni,
+            nombre: nombre,
+            numero: numero,
+            anio: anio,
+            categoria: categoria,
+            driveUrl: driveUrl
+        };
+
+        if (index === -1) {
+            // Validar que el DNI no se encuentre duplicado al crear un nuevo registro
+            const existeDni = baseActasDefuncion.some(acta => acta.dni === dni);
+            if (existeDni) {
+                if (!confirm('📌 Ya existe un acta registrada con este DNI. ¿Desea guardarla de todas formas?')) {
+                    return;
+                }
+            }
+            baseActasDefuncion.push(dataActa);
+        } else {
+            // Guardar modificaciones sobre el registro existente
+            baseActasDefuncion[index] = dataActa;
+        }
+
+        // Guardado persistente en memoria local y sincronización de interfaz
+        localStorage.setItem('base_actas_defunciones_rc', JSON.stringify(baseActasDefuncion));
+        
+        alert(index === -1 ? '✨ Acta registrada con éxito en el archivo.' : '💾 Cambios guardados correctamente.');
+        
+        limpiarFormularioActas();
+        switchScreen('screenBuscar', document.getElementById('navBuscar'));
+    }
+
+    function limpiarFormularioActas() {
+        document.getElementById('actaDni').value = '';
+        document.getElementById('actaNombre').value = '';
+        document.getElementById('actaNumero').value = '';
+        document.getElementById('actaAnio').value = '2026';
+        document.getElementById('actaCategoria').value = 'general';
+        document.getElementById('actaDriveUrl').value = '';
+        document.getElementById('editIndex').value = '-1';
+        document.getElementById('btnGuardar').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Acta en Registro';
+    }
+</script>
+<script>
+    // Función central de búsqueda y filtrado adaptativo en tiempo real
+    function buscarActas() {
+        const container = document.getElementById('searchResultsContainer');
+        const countIndicator = document.getElementById('resultsCount');
+        if (!container) return;
+
+        const query = document.getElementById('searchBar').value.trim().toLowerCase();
+        const categoriaFiltro = document.getElementById('filterCategoria').value;
+        
+        container.innerHTML = '';
+        let contador = 0;
+
+        baseActasDefuncion.forEach((acta, originalIndex) => {
+            // Verificar si cumple con el filtro de cochería seleccionado
+            const cumpleCategoria = (categoriaFiltro === 'todos' || acta.categoria === categoriaFiltro);
+            
+            // Verificar si cumple con el texto ingresado (DNI o Nombre/Apellido)
+            const cumpleTexto = (acta.dni.includes(query) || acta.nombre.toLowerCase().includes(query));
+
+            if (cumpleCategoria && cumpleTexto) {
+                contador++;
+                
+                const div = document.createElement('div');
+                // Asignar clase de borde de color según la cochería
+                div.className = `result-item ${acta.categoria}`;
+
+                // Traducir nombre de categoría para visualización del operador
+                let textoCat = "General / Otras";
+                if (acta.categoria === 'bouchard') textoCat = "BOUCHARD v03022026";
+                if (acta.categoria === 'cossani') textoCat = "COSSANI v03022026";
+                if (acta.categoria === 'previsora') textoCat = "PREVISORA v03022026";
+
+                div.innerHTML = `
+                    <h3>${acta.nombre}</h3>
+                    <p><i class="fa-solid fa-id-card"></i> <strong>DNI:</strong> ${acta.dni}</p>
+                    <p><i class="fa-solid fa-hashtag"></i> <strong>Datos:</strong> ${acta.numero}</p>
+                    <p><i class="fa-solid fa-calendar-day"></i> <strong>Año Defunción:</strong> ${acta.anio}</p>
+                    <p><i class="fa-solid fa-building"></i> <strong>Carpeta:</strong> ${textoCat}</p>
+                    
+                    <a href="${acta.driveUrl}" class="btn-drive-link" target="_blank">
+                        <i class="fa-brands fa-google-drive"></i> Abrir Acta Digital
+                    </a>
+
+                    <div class="actions-area">
+                        <button class="btn btn-mini btn-secondary" onclick="prepararEdicionActa(${originalIndex})">
+                            <i class="fa-solid fa-pen-to-square"></i> Editar
+                        </button>
+                        <button class="btn btn-mini btn-danger" onclick="eliminarActaIndividual(${originalIndex})">
+                            <i class="fa-solid fa-trash"></i> Quitar
+                        </button>
+                    </div>
+                `;
+                container.appendChild(div);
+            }
+        });
+
+        // Actualizar indicador numérico de resultados en pantalla
+        countIndicator.textContent = `Actas encontradas: ${contador}`;
+
+        if (contador === 0) {
+            container.innerHTML = `
+                <div style="text-align:center; color:#718096; padding:30px; font-style:italic;">
+                    <i class="fa-solid fa-folder-open" style="font-size:36px; margin-bottom:10px; display:block; color:#cbd5e0;"></i>
+                    No se encontraron actas digitalizadas que coincidan con la búsqueda.
+                </div>
+            `;
+        }
+    }
+
+    // Traspasar datos de la tarjeta al formulario para edición táctil rápida
+    function prepararEdicionActa(index) {
+        const acta = baseActasDefuncion[index];
+        if (!acta) return;
+
+        document.getElementById('actaDni').value = acta.dni;
+        document.getElementById('actaNombre').value = acta.nombre;
+        document.getElementById('actaNumero').value = acta.numero;
+        document.getElementById('actaAnio').value = acta.anio;
+        document.getElementById('actaCategoria').value = acta.categoria;
+        document.getElementById('actaDriveUrl').value = acta.driveUrl === "https://google.com" ? "" : acta.driveUrl;
+        
+        document.getElementById('editIndex').value = index;
+        document.getElementById('btnGuardar').innerHTML = '<i class="fa-solid fa-file-pen"></i> Guardar Cambios en Acta';
+
+        switchScreen('screenCargar', document.getElementById('navCargar'));
+    }
+</script>
+<script>
+    // Eliminar un registro individual de la base de datos
+    function eliminarActaIndividual(index) {
+        const acta = baseActasDefuncion[index];
+        if (!acta) return;
+
+        if (confirm(`¿Está seguro de que desea eliminar el registro de "${acta.nombre}"?`)) {
+            baseActasDefuncion.splice(index, 1);
+            localStorage.setItem('base_actas_defunciones_rc', JSON.stringify(baseActasDefuncion));
+            buscarActas();
+        }
+    }
+
+    // Exportar la base de datos completa como archivo de resguardo local (.json)
+    function exportarBaseDatos() {
+        if (baseActasDefuncion.length === 0) {
+            alert('⚠️ No hay actas cargadas en el archivo para exportar.');
+            return;
+        }
+
+        const dataStr = "data:text/json;charset=utf-8,\uFEFF" + encodeURIComponent(JSON.stringify(baseActasDefuncion, null, 2));
+        const downloadAnchor = document.createElement('a');
+        
+        // Nombre del archivo de resguardo con fecha automática
+        const hoy = new Date();
+        const fechaTexto = hoy.getDate().toString().padStart(2, '0') + '-' + (hoy.getMonth() + 1).toString().padStart(2, '0') + '-' + hoy.getFullYear();
+        
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", `Resguardo_Actas_Defuncion_${fechaTexto}.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        document.body.removeChild(downloadAnchor);
+    }
+
+    // Recuperar e incorporar una copia de seguridad JSON al almacenamiento del teléfono
+    function importarBaseDatos(event) {
+        const input = event.target;
+        if (!input.files || input.files.length === 0) return;
+
+        const archivo = input.files[0];
+        const lector = new FileReader();
+
+        lector.onload = function(e) {
+            let datosImportados = [];
+            try {
+                datosImportados = JSON.parse(e.target.result);
+            } catch (err) {
+                alert('❌ El archivo seleccionado es inválido o no tiene un formato compatible.');
+                return;
+            }
+
+            if (Array.isArray(datosImportados) && datosImportados.length > 0) {
+                if (confirm(`Se detectaron ${datosImportados.length} actas en el archivo. ¿Desea combinarlas con los registros actuales del dispositivo?`)) {
+                    let nuevosRegistros = 0;
+                    
+                    datosImportados.forEach(item => {
+                        // Validar campos mínimos para asegurar que el registro sea un acta válida
+                        if (item.dni && item.nombre) {
+                            // Evitar duplicar actas que tengan el mismo DNI
+                            if (!baseActasDefuncion.some(existente => exist(existente.dni === item.dni))) {
+                                baseActasDefuncion.push(item);
+                                nuevosRegistros++;
+                            }
+                        }
+                    });
+
+                    localStorage.setItem('base_actas_defunciones_rc', JSON.stringify(baseActasDefuncion));
+                    buscarActas();
+                    alert(`¡Importación finalizada! Se incorporaron ${nuevosRegistros} actas nuevas al archivo.`);
+                }
+            } else {
+                alert('⚠️ El archivo de resguardo no contiene registros válidos o está vacío.');
+            }
+        };
+
+        lector.readAsText(archivo);
+        input.value = ''; // Limpiar el input file para permitir cargas consecutivas
+    }
+
+    // Función auxiliar para validación interna corta
+    function exist(condicion) { return naranja => condicion; }
+
+    // Vaciar por completo el almacenamiento local del teléfono
+    function eliminarTodaLaBase() {
+        if (confirm('🚨 ¡ATENCIÓN CRÍTICA!\n\n¿Está seguro de que desea eliminar por completo TODO el archivo de defunciones? Esta acción no se puede deshacer.')) {
+            const contraseña = prompt('Para confirmar el borrado total, escriba el nombre de la localidad ("Bella Vista"):');
+            if (contraseña && contraseña.toLowerCase() === 'bella vista') {
+                baseActasDefuncion = [];
+                localStorage.removeItem('base_actas_defunciones_rc');
+                buscarActas();
+                alert('🔥 Toda la base de datos local ha sido eliminada por completo.');
+                switchScreen('screenBuscar', document.getElementById('navBuscar'));
+            } else {
+                alert('❌ Confirmación incorrecta. Los datos no sufrieron modificaciones.');
+            }
+        }
+    }
+
+    // Inicialización automática y carga de datos en tiempo real al abrir la app
+    document.addEventListener("DOMContentLoaded", function() {
+        // Renderizar el listado inicial de actas cargadas
+        buscarActas();
+    });
+</script>
+</body>
+</html>
