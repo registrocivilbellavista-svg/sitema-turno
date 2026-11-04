@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Buscador de Actas - Registro Civil</title>
+    <title>Archivo de Defunciones - Registro Civil</title>
     
     <!-- Librería de íconos Font Awesome 6 Premium Estables -->
     <link rel="stylesheet" href="https://cloudflare.com">
@@ -147,7 +147,6 @@
             box-shadow: 0 4px 10px rgba(113, 128, 150, 0.2);
         }
         .btn-secondary:active { background-color: #4a5568; }
-
         /* TARJETAS DE RESULTADOS EN BÚSQUEDA (CIUDADANOS) */
         .result-item {
             background: white;
@@ -189,7 +188,7 @@
 
         /* Botón de acceso directo a Drive en la tarjeta */
         .btn-drive-link {
-            background-color: #ffc107;
+            background-color: #38a169;
             color: #fff;
             padding: 10px 14px;
             border-radius: 6px;
@@ -264,7 +263,6 @@
     </style>
 </head>
 <body>
-
 <div class="app-header">
     <i class="fa-solid fa-box-archive"></i>
     <h1>Archivo de Defunciones</h1>
@@ -293,10 +291,9 @@
         </div>
 
         <div id="searchResultsContainer" style="margin-top: 10px;">
-            <!-- Las tarjetas de ciudadanos se inyectan dinámicamente con JavaScript -->
+            <!-- El mensaje inicial o las tarjetas se inyectan mediante JavaScript -->
         </div>
     </div>
-
     <!-- PANTALLA 2: CARGAR NUEVA ACTA -->
     <div id="screenCargar" class="app-screen">
         <div class="card">
@@ -342,7 +339,7 @@
                 <i class="fa-solid fa-shield-halved" style="color:#3182ce;"></i> Resguardo de Información
             </h2>
             <p style="font-size: 13px; color: #4a5568; line-height: 1.5;">
-                Toda la base de datos de actas se almacena de forma segura en la memoria interna de la aplicación. Utilizá los botones de abajo para generar copias de seguridad.
+                Toda la base de datos se aloja en tiempo real en la nube centralizada de la oficina. Podés descargar resguardos físicos locales en formato JSON utilizando las opciones de abajo.
             </p>
             
             <button class="btn btn-secondary" onclick="exportarBaseDatos()">
@@ -368,7 +365,7 @@
         </div>
     </div>
 
-</div>
+</div> <!-- Cierre de app-container -->
 
 <!-- BOTONERA INFERIOR FIJA (AL ALCANCE DEL PULGAR) -->
 <div class="bottom-nav">
@@ -386,8 +383,11 @@
     </div>
 </div>
 <script>
-    // Inicialización de la Base de Datos Local persistente en el dispositivo
-    let baseActasDefuncion = JSON.parse(localStorage.getItem('base_actas_defunciones_rc')) || [];
+    // URL centralizada de la base de datos de la oficina provista por el usuario
+    const API_URL_SHEETS = "https://google.com";
+    
+    // Almacenamiento temporal en memoria para el filtrado reactivo
+    let baseActasDefuncion = [];
 
     // Función para alternar entre las vistas/pantallas de la aplicación (Efecto Nativo)
     function switchScreen(screenId, navElement) {
@@ -406,16 +406,16 @@
         if (targetScreen) targetScreen.style.display = 'block';
         if (navElement) navElement.classList.add('active');
 
-        // Forzar renderizado o limpieza según corresponda
-        if (screenId === 'screenBuscar') {
-            buscarActas();
-        } else if (screenId === 'screenCargar' && parseInt(document.getElementById('editIndex').value) === -1) {
+        // Forzar limpieza guiada si se ingresa a cargar de cero
+        if (screenId === 'screenCargar' && parseInt(document.getElementById('editIndex').value) === -1) {
             limpiarFormularioActas();
+        } else if (screenId === 'screenBuscar') {
+            buscarActas();
         }
     }
 
-    // Función principal para dar de alta o guardar modificaciones de un acta
-    function guardarActa() {
+    // Función principal para dar de alta o guardar modificaciones de un acta en la nube
+    async function guardarActa() {
         const dni = document.getElementById('actaDni').value.trim();
         const nombre = document.getElementById('actaNombre').value.trim().toUpperCase();
         const numero = document.getElementById('actaNumero').value.trim() || '-';
@@ -430,7 +430,7 @@
             return;
         }
 
-        // Si no se asignó un enlace, redirigir al link base de la carpeta raíz provisto por el usuario
+        // Si no se asignó un enlace, redirigir al link base de la carpeta raíz
         if (!driveUrl) {
             driveUrl = "https://google.com";
         }
@@ -441,46 +441,34 @@
             numero: numero,
             anio: anio,
             categoria: categoria,
-            driveUrl: driveUrl
+            driveUrl: driveUrl,
+            editIndex: index
         };
 
-        if (index === -1) {
-            // Validar que el DNI no se encuentre duplicado al crear un nuevo registro
-            const existeDni = baseActasDefuncion.some(acta => acta.dni === dni);
-            if (existeDni) {
-                if (!confirm('📌 Ya existe un acta registrada con este DNI. ¿Desea guardarla de todas formas?')) {
-                    return;
-                }
-            }
-            baseActasDefuncion.push(dataActa);
-        } else {
-            // Guardar modificaciones sobre el registro existente
-            baseActasDefuncion[index] = dataActa;
+        const btnGuardar = document.getElementById('btnGuardar');
+        btnGuardar.disabled = true;
+        btnGuardar.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sincronizando con la nube...`;
+
+        try {
+            // Despacho transaccional cruzado compatible con Render mediante no-cors
+            await fetch(API_URL_SHEETS, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dataActa)
+            });
+
+            alert(index === -1 ? '✨ Acta registrada con éxito en el archivo central.' : '💾 Cambios guardados correctamente en la nube.');
+            limpiarFormularioActas();
+            switchScreen('screenBuscar', document.getElementById('navBuscar'));
+        } catch (err) {
+            alert('❌ Error al subir la información. Verifique la conexión a internet de la oficina.');
+        } finally {
+            btnGuardar.disabled = false;
         }
-
-        // Guardado persistente en memoria local y sincronización de interfaz
-        localStorage.setItem('base_actas_defunciones_rc', JSON.stringify(baseActasDefuncion));
-        
-        alert(index === -1 ? '✨ Acta registrada con éxito en el archivo.' : '💾 Cambios guardados correctamente.');
-        
-        limpiarFormularioActas();
-        switchScreen('screenBuscar', document.getElementById('navBuscar'));
     }
-
-    function limpiarFormularioActas() {
-        document.getElementById('actaDni').value = '';
-        document.getElementById('actaNombre').value = '';
-        document.getElementById('actaNumero').value = '';
-        document.getElementById('actaAnio').value = '2026';
-        document.getElementById('actaCategoria').value = 'general';
-        document.getElementById('actaDriveUrl').value = '';
-        document.getElementById('editIndex').value = '-1';
-        document.getElementById('btnGuardar').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Acta en Registro';
-    }
-</script>
-<script>
-    // Función central de búsqueda y filtrado adaptativo en tiempo real
-    function buscarActas() {
+    // Función central de búsqueda y filtrado adaptativo en tiempo real en la nube
+    async function buscarActas() {
         const container = document.getElementById('searchResultsContainer');
         const countIndicator = document.getElementById('resultsCount');
         if (!container) return;
@@ -488,24 +476,46 @@
         const query = document.getElementById('searchBar').value.trim().toLowerCase();
         const categoriaFiltro = document.getElementById('filterCategoria').value;
         
+        // Mantener limpio el render si no hay una búsqueda activa escrita
+        if (query.length === 0) {
+            container.innerHTML = `
+                <div style="text-align:center; color:#718096; padding:30px; font-style:italic;">
+                    <i class="fa-solid fa-magnifying-glass" style="font-size:36px; margin-bottom:10px; display:block; color:#cbd5e0;"></i>
+                    Ingrese un DNI o Apellido en la barra superior para buscar un acta.
+                </div>
+            `;
+            countIndicator.textContent = 'Actas encontradas: 0';
+            return; 
+        }
+
+        container.innerHTML = `
+            <div style="text-align:center; padding:20px; color:#3182ce; font-weight:bold;">
+                <i class="fa-solid fa-spinner fa-spin" style="font-size:24px; margin-bottom:8px; display:block;"></i> 
+                Consultando archivo central de la oficina...
+            </div>`;
+
+        try {
+            // Consulta asincrónica directa a la base de datos distribuida en Sheets
+            const response = await fetch(API_URL_SHEETS);
+            baseActasDefuncion = await response.json();
+        } catch (err) {
+            container.innerHTML = `<div style="text-align:center; color:#e53e3e; padding:20px; font-weight:bold;">⚠️ Error de red al conectar con el servidor. Reintente por favor.</div>`;
+            return;
+        }
+
         container.innerHTML = '';
         let contador = 0;
 
         baseActasDefuncion.forEach((acta, originalIndex) => {
-            // Verificar si cumple con el filtro de cochería seleccionado
             const cumpleCategoria = (categoriaFiltro === 'todos' || acta.categoria === categoriaFiltro);
-            
-            // Verificar si cumple con el texto ingresado (DNI o Nombre/Apellido)
             const cumpleTexto = (acta.dni.includes(query) || acta.nombre.toLowerCase().includes(query));
 
             if (cumpleCategoria && cumpleTexto) {
                 contador++;
                 
                 const div = document.createElement('div');
-                // Asignar clase de borde de color según la cochería
                 div.className = `result-item ${acta.categoria}`;
 
-                // Traducir nombre de categoría para visualización del operador
                 let textoCat = "General / Otras";
                 if (acta.categoria === 'bouchard') textoCat = "BOUCHARD v03022026";
                 if (acta.categoria === 'cossani') textoCat = "COSSANI v03022026";
@@ -526,16 +536,12 @@
                         <button class="btn btn-mini btn-secondary" onclick="prepararEdicionActa(${originalIndex})">
                             <i class="fa-solid fa-pen-to-square"></i> Editar
                         </button>
-                        <button class="btn btn-mini btn-danger" onclick="eliminarActaIndividual(${originalIndex})">
-                            <i class="fa-solid fa-trash"></i> Quitar
-                        </button>
                     </div>
                 `;
                 container.appendChild(div);
             }
         });
 
-        // Actualizar indicador numérico de resultados en pantalla
         countIndicator.textContent = `Actas encontradas: ${contador}`;
 
         if (contador === 0) {
@@ -547,7 +553,6 @@
             `;
         }
     }
-
     // Traspasar datos de la tarjeta al formulario para edición táctil rápida
     function prepararEdicionActa(index) {
         const acta = baseActasDefuncion[index];
@@ -562,34 +567,36 @@
         
         document.getElementById('editIndex').value = index;
         document.getElementById('btnGuardar').innerHTML = '<i class="fa-solid fa-file-pen"></i> Guardar Cambios en Acta';
+        document.getElementById('btnGuardar').style.backgroundColor = '#d69e2e';
 
         switchScreen('screenCargar', document.getElementById('navCargar'));
     }
-</script>
-<script>
-    // Eliminar un registro individual de la base de datos
-    function eliminarActaIndividual(index) {
-        const acta = baseActasDefuncion[index];
-        if (!acta) return;
 
-        if (confirm(`¿Está seguro de que desea eliminar el registro de "${acta.nombre}"?`)) {
-            baseActasDefuncion.splice(index, 1);
-            localStorage.setItem('base_actas_defunciones_rc', JSON.stringify(baseActasDefuncion));
-            buscarActas();
-        }
+    // Limpieza estructural de los campos del formulario de actas
+    function limpiarFormularioActas() {
+        document.getElementById('actaDni').value = '';
+        document.getElementById('actaNombre').value = '';
+        document.getElementById('actaNumero').value = '';
+        document.getElementById('actaAnio').value = '2026';
+        document.getElementById('actaCategoria').value = 'general';
+        document.getElementById('actaDriveUrl').value = '';
+        document.getElementById('editIndex').value = '-1';
+        
+        const btn = document.getElementById('btnGuardar');
+        btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Acta en Registro';
+        btn.style.backgroundColor = '#3182ce';
     }
 
-    // Exportar la base de datos completa como archivo de resguardo local (.json)
+    // Exportar la base de datos completa extraída como archivo de resguardo local (.json)
     function exportarBaseDatos() {
         if (baseActasDefuncion.length === 0) {
-            alert('⚠️ No hay actas cargadas en el archivo para exportar.');
+            alert('⚠️ Realice una consulta primero para cargar los registros en la memoria antes de exportar.');
             return;
         }
 
         const dataStr = "data:text/json;charset=utf-8,\uFEFF" + encodeURIComponent(JSON.stringify(baseActasDefuncion, null, 2));
         const downloadAnchor = document.createElement('a');
         
-        // Nombre del archivo de resguardo con fecha automática
         const hoy = new Date();
         const fechaTexto = hoy.getDate().toString().padStart(2, '0') + '-' + (hoy.getMonth() + 1).toString().padStart(2, '0') + '-' + hoy.getFullYear();
         
@@ -600,15 +607,15 @@
         document.body.removeChild(downloadAnchor);
     }
 
-    // Recuperar e incorporar una copia de seguridad JSON al almacenamiento del teléfono
-    function importarBaseDatos(event) {
+    // Recuperar e incorporar una copia de seguridad JSON externa al almacenamiento de Google Sheets
+    async function importarBaseDatos(event) {
         const input = event.target;
         if (!input.files || input.files.length === 0) return;
 
         const archivo = input.files[0];
         const lector = new FileReader();
 
-        lector.onload = function(e) {
+        lector.onload = async function(e) {
             let datosImportados = [];
             try {
                 datosImportados = JSON.parse(e.target.result);
@@ -618,23 +625,33 @@
             }
 
             if (Array.isArray(datosImportados) && datosImportados.length > 0) {
-                if (confirm(`Se detectaron ${datosImportados.length} actas en el archivo. ¿Desea combinarlas con los registros actuales del dispositivo?`)) {
-                    let nuevosRegistros = 0;
+                if (confirm(`Se detectaron ${datosImportados.length} actas. ¿Desea subirlas de forma masiva a la nube de la oficina?`)) {
+                    alert('Subiendo registros en segundo plano. Esto puede demorar unos instantes...');
                     
-                    datosImportados.forEach(item => {
-                        // Validar campos mínimos para asegurar que el registro sea un acta válida
+                    for(let item of datosImportados) {
                         if (item.dni && item.nombre) {
-                            // Evitar duplicar actas que tengan el mismo DNI
-                            if (!baseActasDefuncion.some(existente => exist(existente.dni === item.dni))) {
-                                baseActasDefuncion.push(item);
-                                nuevosRegistros++;
-                            }
+                            const dataActa = {
+                                dni: item.dni,
+                                nombre: item.nombre,
+                                numero: item.numero || '-',
+                                anio: item.anio || '2026',
+                                categoria: item.categoria || 'general',
+                                driveUrl: item.driveUrl || 'https://google.com',
+                                editIndex: -1
+                            };
+                            
+                            try {
+                                await fetch(API_URL_SHEETS, {
+                                    method: 'POST',
+                                    mode: 'no-cors',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify(dataActa)
+                                });
+                            } catch(e) {}
                         }
-                    });
-
-                    localStorage.setItem('base_actas_defunciones_rc', JSON.stringify(baseActasDefuncion));
+                    }
+                    alert('¡Importación masiva completada!');
                     buscarActas();
-                    alert(`¡Importación finalizada! Se incorporaron ${nuevosRegistros} actas nuevas al archivo.`);
                 }
             } else {
                 alert('⚠️ El archivo de resguardo no contiene registros válidos o está vacío.');
@@ -642,21 +659,21 @@
         };
 
         lector.readAsText(archivo);
-        input.value = ''; // Limpiar el input file para permitir cargas consecutivas
+        input.value = '';
     }
 
-    // Función auxiliar para validación interna corta
-    function exist(condicion) { return naranja => condicion; }
-
-    // Vaciar por completo el almacenamiento local del teléfono
-    function eliminarTodaLaBase() {
+    // Vaciar por completo la base de datos remota con contraseña de localidad
+    async function eliminarTodaLaBase() {
         if (confirm('🚨 ¡ATENCIÓN CRÍTICA!\n\n¿Está seguro de que desea eliminar por completo TODO el archivo de defunciones? Esta acción no se puede deshacer.')) {
             const contraseña = prompt('Para confirmar el borrado total, escriba el nombre de la localidad ("Bella Vista"):');
             if (contraseña && contraseña.toLowerCase() === 'bella vista') {
+                
+                // Envía señal de purga especial al endpoint en Google Apps Script
+                await fetch(API_URL_SHEETS + "?clear=true", { method: 'GET', mode: 'no-cors' });
+                
                 baseActasDefuncion = [];
-                localStorage.removeItem('base_actas_defunciones_rc');
                 buscarActas();
-                alert('🔥 Toda la base de datos local ha sido eliminada por completo.');
+                alert('🔥 Toda la base de datos local y remota ha sido eliminada por completo.');
                 switchScreen('screenBuscar', document.getElementById('navBuscar'));
             } else {
                 alert('❌ Confirmación incorrecta. Los datos no sufrieron modificaciones.');
@@ -664,9 +681,8 @@
         }
     }
 
-    // Inicialización automática y carga de datos en tiempo real al abrir la app
+    // Inicialización guiada limpia y automática al arrancar la app web
     document.addEventListener("DOMContentLoaded", function() {
-        // Renderizar el listado inicial de actas cargadas
         buscarActas();
     });
 </script>
