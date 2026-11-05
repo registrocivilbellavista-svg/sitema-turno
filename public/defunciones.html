@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Archivo de Defunciones - ***Registro Civil***</title>
+    <title>Archivo de Defunciones - Registro Civil</title>
     
     <!-- Librería de íconos Font Awesome 6 Premium Estables -->
     <link rel="stylesheet" href="https://cloudflare.com">
@@ -293,15 +293,13 @@
         </div>
 
         <div id="searchResultsContainer" style="margin-top: 10px;">
-            <!-- El mensaje inicial guiado se inyecta mediante JavaScript -->
+            <!-- El mensaje de guía inicial limpio se inyecta dinámicamente mediante JavaScript -->
         </div>
     </div>
     <!-- PANTALLA 2: CARGAR NUEVA ACTA -->
     <div id="screenCargar" class="app-screen">
         <div class="card">
-            <h2 style="margin-top:0; font-size: 16px; color: #1a365d; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
-                <i class="fa-solid fa-file-circle-plus" style="color:#3182ce;"></i> Registrar Acta Digitalizada
-            </h2>
+            <h2 style="margin-top:0; font-size: 16px; color: #1a365d; text-transform: uppercase; display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-file-circle-plus" style="color:#3182ce;"></i> Registrar Acta Digitalizada</h2>
             
             <input type="hidden" id="editIndex" value="-1">
 
@@ -315,7 +313,7 @@
             <input type="text" id="actaNumero" placeholder="Ej: Acta 12 - Tomo I - Folio 45">
 
             <label for="actaAnio"><i class="fa-solid fa-calendar-days"></i> Año de la Defunción:</label>
-            <input type="number" id="actaAnio" placeholder="Ej: 2026" value="2026">
+            <input type="number" id="actaAnio" value="2026">
 
             <label for="actaCategoria"><i class="fa-solid fa-building"></i> Clasificación / Cochería:</label>
             <select id="actaCategoria">
@@ -328,42 +326,26 @@
             <label for="actaDriveUrl"><i class="fa-solid fa-cloud"></i> Enlace de Archivo (Google Drive):</label>
             <input type="text" id="actaDriveUrl" placeholder="Pegá el link para compartir de Drive aquí...">
 
-            <button class="btn" id="btnGuardar" onclick="guardarActa()">
-                <i class="fa-solid fa-floppy-disk"></i> Guardar Acta en Registro
-            </button>
+            <button class="btn" id="btnGuardar" onclick="guardarActa()"><i class="fa-solid fa-floppy-disk"></i> Guardar Acta en Registro</button>
         </div>
     </div>
 
     <!-- PANTALLA 3: CONFIGURACIÓN Y RESPALDOS -->
     <div id="screenConfig" class="app-screen">
         <div class="card">
-            <h2 style="margin-top:0; font-size: 16px; color: #1a365d; text-transform: uppercase;">
-                <i class="fa-solid fa-shield-halved" style="color:#3182ce;"></i> Resguardo de Información
-            </h2>
-            <p style="font-size: 13px; color: #4a5568; line-height: 1.5;">
-                Toda la base de datos se aloja en tiempo real en la nube centralizada de la oficina. Podés descargar resguardos físicos locales en formato JSON utilizando las opciones de abajo.
-            </p>
+            <h2 style="margin-top:0; font-size: 16px; color: #1a365d; text-transform: uppercase;"><i class="fa-solid fa-shield-halved" style="color:#3182ce;"></i> Resguardo de Información</h2>
+            <p style="font-size: 13px; color: #4a5568; line-height: 1.5;">Toda la base de datos se aloja en tiempo real en la nube centralizada de la oficina.</p>
             
-            <button class="btn btn-secondary" onclick="exportarBaseDatos()">
-                <i class="fa-solid fa-file-export"></i> Exportar Resguardo (JSON)
-            </button>
+            <button class="btn btn-secondary" onclick="exportarBaseDatos()"><i class="fa-solid fa-file-export"></i> Exportar Resguardo (JSON)</button>
             
-            <label for="importFile" style="background-color: #4a5568; color: white; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-                <i class="fa-solid fa-file-import"></i> Importar Resguardo (JSON)
-            </label>
+            <label for="importFile" style="background-color: #4a5568; color: white; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 12px;"><i class="fa-solid fa-file-import"></i> Importar Resguardo (JSON)</label>
             <input type="file" id="importFile" accept=".json" onchange="importarBaseDatos(event)" style="display: none;">
         </div>
 
         <div class="card" style="border-top: 4px solid #e53e3e;">
-            <h2 style="margin-top:0; font-size: 16px; color: #c53030; text-transform: uppercase;">
-                <i class="fa-solid fa-triangle-exclamation"></i> Zona de Peligro
-            </h2>
-            <p style="font-size: 13px; color: #4a5568;">
-                Esta acción borrará de manera definitiva todas las actas indexadas en la aplicación. Asegurate de tener una copia de resguardo.
-            </p>
-            <button class="btn btn-danger" onclick="eliminarTodaLaBase()">
-                <i class="fa-solid fa-trash-can"></i> Borrar Toda la Base de Datos
-            </button>
+            <h2 style="margin-top:0; font-size: 16px; color: #c53030; text-transform: uppercase;"><i class="fa-solid fa-triangle-exclamation"></i> Zona de Peligro</h2>
+            <p style="font-size: 13px; color: #4a5568;">Esta acción borrará de manera definitiva todas las actas indexadas en la aplicación. Asegurate de tener una copia de resguardo.</p>
+            <button class="btn btn-danger" onclick="eliminarTodaLaBase()"><i class="fa-solid fa-trash-can"></i> Borrar Toda la Base de Datos</button>
         </div>
     </div>
 
@@ -371,22 +353,13 @@
 
 <!-- BOTONERA INFERIOR FIJA (AL ALCANCE DEL PULGAR) -->
 <div class="bottom-nav">
-    <div id="navBuscar" class="nav-item active" onclick="switchScreen('screenBuscar', this)">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <span>Buscar</span>
-    </div>
-    <div id="navCargar" class="nav-item" onclick="switchScreen('screenCargar', this)">
-        <i class="fa-solid fa-file-circle-plus"></i>
-        <span>Cargar</span>
-    </div>
-    <div id="navConfig" class="nav-item" onclick="switchScreen('screenConfig', this)">
-        <i class="fa-solid fa-gears"></i>
-        <span>Resguardos</span>
-    </div>
+    <div id="navBuscar" class="nav-item active" onclick="switchScreen('screenBuscar', this)"><i class="fa-solid fa-magnifying-glass"></i><span>Buscar</span></div>
+    <div id="navCargar" class="nav-item" onclick="switchScreen('screenCargar', this)"><i class="fa-solid fa-file-circle-plus"></i><span>Cargar</span></div>
+    <div id="navConfig" class="nav-item" onclick="switchScreen('screenConfig', this)"><i class="fa-solid fa-gears"></i><span>Resguardos</span></div>
 </div>
 <script>
-    // URL centralizada definitiva de tu Google Apps Script de producción
-    const API_URL_SHEETS = "https://google.com";
+    // URL centralizada definitiva de tu Google Apps Script de producción actualizada por el usuario
+    const API_URL_SHEETS = "https://script.google.com/macros/s/AKfycbyWtYU1SYylzb1j0ASC1qSCq4GdsEiQ5ZTgMdMc0RHNsDxNyb6A-ZcnmVpDzgXQRnQMrw/exec";
     
     // Almacenamiento temporal en memoria para el filtrado reactivo
     let baseActasDefuncion = [];
@@ -507,7 +480,6 @@
 
                 if (cumpleCategoria && cumpleTexto) {
                     contador++;
-                    
                     const div = document.createElement('div');
                     div.className = `result-item ${acta.categoria}`;
 
@@ -522,15 +494,9 @@
                         <p><i class="fa-solid fa-hashtag"></i> <strong>Datos:</strong> ${acta.numero}</p>
                         <p><i class="fa-solid fa-calendar-day"></i> <strong>Año Defunción:</strong> ${acta.anio}</p>
                         <p><i class="fa-solid fa-building"></i> <strong>Carpeta:</strong> ${textoCat}</p>
-                        
-                        <a href="${acta.driveUrl}" class="btn-drive-link" target="_blank">
-                            <i class="fa-brands fa-google-drive"></i> Abrir Acta Digital
-                        </a>
-
+                        <a href="${acta.driveUrl}" class="btn-drive-link" target="_blank"><i class="fa-brands fa-google-drive"></i> Abrir Acta Digital</a>
                         <div class="actions-area">
-                            <button class="btn btn-mini btn-secondary" onclick="prepararEdicionActa(${originalIndex})">
-                                <i class="fa-solid fa-pen-to-square"></i> Editar
-                            </button>
+                            <button class="btn btn-mini btn-secondary" onclick="prepararEdicionActa(${originalIndex})"><i class="fa-solid fa-pen-to-square"></i> Editar</button>
                         </div>
                     `;
                     container.appendChild(div);
@@ -557,22 +523,15 @@
     function prepararEdicionActa(index) {
         const acta = baseActasDefuncion[index];
         if (!acta) return;
-
         document.getElementById('actaDni').value = acta.dni;
         document.getElementById('actaNombre').value = acta.nombre;
         document.getElementById('actaNumero').value = acta.numero;
         document.getElementById('actaAnio').value = acta.anio;
         document.getElementById('actaCategoria').value = acta.categoria;
         document.getElementById('actaDriveUrl').value = acta.driveUrl === "https://google.com" ? "" : acta.driveUrl;
-        
         document.getElementById('editIndex').value = index;
-        
         const btn = document.getElementById('btnGuardar');
-        if (btn) {
-            btn.innerHTML = '<i class="fa-solid fa-file-pen"></i> Guardar Cambios en Acta';
-            btn.style.backgroundColor = '#d69e2e';
-        }
-
+        if (btn) { btn.innerHTML = '<i class="fa-solid fa-file-pen"></i> Guardar Cambios'; btn.style.backgroundColor = '#d69e2e'; }
         switchScreen('screenCargar', document.getElementById('navCargar'));
     }
 
@@ -584,105 +543,30 @@
         document.getElementById('actaCategoria').value = 'general';
         document.getElementById('actaDriveUrl').value = '';
         document.getElementById('editIndex').value = '-1';
-        
         const btn = document.getElementById('btnGuardar');
-        if (btn) {
-            btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Acta en Registro';
-            btn.style.backgroundColor = '#3182ce';
-        }
+        if (btn) { btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Acta en Registro'; btn.style.backgroundColor = '#3182ce'; }
     }
 
     function exportarBaseDatos() {
-        if (baseActasDefuncion.length === 0) {
-            alert('⚠️ Realice una consulta primero para cargar los registros en la memoria antes de exportar.');
-            return;
-        }
-
+        if (baseActasDefuncion.length === 0) { alert('⚠️ Realice una consulta primero para cargar los registros en memoria.'); return; }
         const dataStr = "data:text/json;charset=utf-8,\uFEFF" + encodeURIComponent(JSON.stringify(baseActasDefuncion, null, 2));
         const downloadAnchor = document.createElement('a');
-        
-        const hoy = new Date();
-        const fechaTexto = hoy.getDate().toString().padStart(2, '0') + '-' + (hoy.getMonth() + 1).toString().padStart(2, '0') + '-' + hoy.getFullYear();
-        
         downloadAnchor.setAttribute("href", dataStr);
-        downloadAnchor.setAttribute("download", `Resguardo_Actas_Defuncion_${fechaTexto}.json`);
+        downloadAnchor.setAttribute("download", "Resguardo_Actas.json");
         document.body.appendChild(downloadAnchor);
         downloadAnchor.click();
-        document.body.removeChild(downloadAnchor);
-    }
-
-    async function importarBaseDatos(event) {
-        const input = event.target;
-        if (!input.files || input.files.length === 0) return;
-
-        const archivo = input.files;
-        const lector = new FileReader();
-
-        lector.onload = async function(e) {
-            let datosImportados = [];
-            try {
-                datosImportados = JSON.parse(e.target.result);
-            } catch (err) {
-                alert('❌ El archivo seleccionado es inválido o no tiene un formato compatible.');
-                return;
-            }
-
-            if (Array.isArray(datosImportados) && datosImportados.length > 0) {
-                if (confirm(`Se detectaron ${datosImportados.length} actas. ¿Desea subirlas de forma masiva a la nube de la oficina?`)) {
-                    alert('Subiendo registros en segundo plano. Esto puede demorar unos instantes...');
-                    
-                    for(let item of datosImportados) {
-                        if (item.dni && item.nombre) {
-                            const formVirtual = document.createElement('form');
-                            formVirtual.method = 'POST';
-                            formVirtual.action = API_URL_SHEETS;
-                            formVirtual.target = 'marcoOcultoGoogle';
-
-                            const campos = { 
-                                dni: item.dni, 
-                                nombre: item.nombre, 
-                                numero: item.numero || '-', 
-                                anio: item.anio || '2026', 
-                                categoria: item.categoria || 'general', 
-                                driveUrl: item.driveUrl || 'https://google.com', 
-                                editIndex: -1 
-                            };
-                            
-                            for (const clave in campos) {
-                                const inputOculto = document.createElement('input');
-                                inputOculto.type = 'hidden';
-                                inputOculto.name = clave;
-                                inputOculto.value = campos[clave];
-                                formVirtual.appendChild(inputOculto);
-                            }
-                            document.body.appendChild(formVirtual);
-                            formVirtual.submit();
-                            document.body.removeChild(formVirtual);
-                        }
-                    }
-                    alert('¡Importación masiva enviada a la cola del servidor!');
-                    buscarActas();
-                }
-            } else {
-                alert('⚠️ El archivo de resguardo no contiene registros válidos o está vacío.');
-            }
-        };
-
-        lector.readAsText(archivo);
-        input.value = '';
+        downloadAnchor.remove();
     }
 
     async function eliminarTodaLaBase() {
-        if (confirm('🚨 ¡ATENCIÓN CRÍTICA!\n\n¿Está seguro de que desea eliminar por completo TODO el archivo de defunciones? Esta acción no se puede deshacer.')) {
-            const contraseña = prompt('Para confirmar el borrado total, escriba el nombre de la localidad ("Bella Vista"):');
+        if (confirm('🚨 ¡ATENCIÓN CRÍTICA!\n\n¿Desea borrar todo el archivo?')) {
+            const contraseña = prompt('Escriba "Bella Vista":');
             if (contraseña && contraseña.toLowerCase() === 'bella vista') {
                 await fetch(API_URL_SHEETS + "?clear=true", { method: 'GET' });
                 baseActasDefuncion = [];
                 buscarActas();
-                alert('🔥 Toda la base de datos remota ha sido eliminada por completo.');
+                alert('🔥 Base de datos eliminada.');
                 switchScreen('screenBuscar', document.getElementById('navBuscar'));
-            } else {
-                alert('❌ Confirmación incorrecta. Los datos no sufrieron modificaciones.');
             }
         }
     }
@@ -690,12 +574,7 @@
     document.addEventListener("DOMContentLoaded", function() {
         const container = document.getElementById('searchResultsContainer');
         if (container) {
-            container.innerHTML = `
-                <div style="text-align:center; color:#718096; padding:30px; font-style:italic;">
-                    <i class="fa-solid fa-magnifying-glass" style="font-size:36px; margin-bottom:10px; display:block; color:#cbd5e0;"></i>
-                    Ingrese un DNI o Apellido en la barra superior para buscar un acta.
-                </div>
-            `;
+            container.innerHTML = `<div style="text-align:center; color:#718096; padding:30px; font-style:italic;"><i class="fa-solid fa-magnifying-glass" style="font-size:36px; margin-bottom:10px; display:block; color:#cbd5e0;"></i>Ingrese un DNI o Apellido en la barra superior para buscar un acta.</div>`;
         }
     });
 </script>
