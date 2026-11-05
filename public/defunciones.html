@@ -468,7 +468,7 @@
             btnGuardar.disabled = false;
         }
     }
-    // Función central de búsqueda y filtrado adaptativo corregido sin bloqueos de red
+    // Función central de búsqueda y filtrado adaptativo en tiempo real en la nube
     async function buscarActas() {
         const container = document.getElementById('searchResultsContainer');
         const countIndicator = document.getElementById('resultsCount');
@@ -477,7 +477,7 @@
         const query = document.getElementById('searchBar').value.trim().toLowerCase();
         const categoriaFiltro = document.getElementById('filterCategoria').value;
         
-        // Mantener limpio el render si no hay una búsqueda activa escrita
+        // MANTENER LIMPIO EL INICIO SI NO SE ESCRIBIÓ NADA (Tu solicitud directa)
         if (query.length === 0) {
             container.innerHTML = `
                 <div style="text-align:center; color:#718096; padding:30px; font-style:italic;">
@@ -494,69 +494,6 @@
                 <i class="fa-solid fa-spinner fa-spin" style="font-size:24px; margin-bottom:8px; display:block;"></i> 
                 Consultando archivo central de la oficina...
             </div>`;
-
-        try {
-            // CORRECCIÓN CRÍTICA: Añadimos redirección de credenciales para saltear el bloqueo CORS del navegador
-            const response = await fetch(API_URL_SHEETS, {
-                method: 'GET',
-                redirect: 'follow'
-            });
-            baseActasDefuncion = await response.json();
-        } catch (err) {
-            container.innerHTML = `<div style="text-align:center; color:#e53e3e; padding:20px; font-weight:bold;">⚠️ Error de red al conectar con el servidor. Reintente por favor.</div>`;
-            return;
-        }
-
-        container.innerHTML = '';
-        let contador = 0;
-
-        baseActasDefuncion.forEach((acta, originalIndex) => {
-            const cumpleCategoria = (categoriaFiltro === 'todos' || acta.categoria === categoriaFiltro);
-            const cumpleTexto = (acta.dni.includes(query) || acta.nombre.toLowerCase().includes(query));
-
-            if (cumpleCategoria && cumpleTexto) {
-                contador++;
-                
-                const div = document.createElement('div');
-                div.className = `result-item ${acta.categoria}`;
-
-                let textoCat = "General / Otras";
-                if (acta.categoria === 'bouchard') textoCat = "BOUCHARD v03022026";
-                if (acta.categoria === 'cossani') textoCat = "COSSANI v03022026";
-                if (acta.categoria === 'previsora') textoCat = "PREVISORA v03022026";
-
-                div.innerHTML = `
-                    <h3>${acta.nombre}</h3>
-                    <p><i class="fa-solid fa-id-card"></i> <strong>DNI:</strong> ${acta.dni}</p>
-                    <p><i class="fa-solid fa-hashtag"></i> <strong>Datos:</strong> ${acta.numero}</p>
-                    <p><i class="fa-solid fa-calendar-day"></i> <strong>Año Defunción:</strong> ${acta.anio}</p>
-                    <p><i class="fa-solid fa-building"></i> <strong>Carpeta:</strong> ${textoCat}</p>
-                    
-                    <a href="${acta.driveUrl}" class="btn-drive-link" target="_blank">
-                        <i class="fa-brands fa-google-drive"></i> Abrir Acta Digital
-                    </a>
-
-                    <div class="actions-area">
-                        <button class="btn btn-mini btn-secondary" onclick="prepararEdicionActa(${originalIndex})">
-                            <i class="fa-solid fa-pen-to-square"></i> Editar
-                        </button>
-                    </div>
-                `;
-                container.appendChild(div);
-            }
-        });
-
-        countIndicator.textContent = `Actas encontradas: ${contador}`;
-
-        if (contador === 0) {
-            container.innerHTML = `
-                <div style="text-align:center; color:#718096; padding:30px; font-style:italic;">
-                    <i class="fa-solid fa-folder-open" style="font-size:36px; margin-bottom:10px; display:block; color:#cbd5e0;"></i>
-                    No se encontraron actas digitalizadas que coincidan con la búsqueda.
-                </div>
-            `;
-        }
-    }
 
         try {
             // Consulta asincrónica directa a la base de datos distribuida en Sheets
