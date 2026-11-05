@@ -3,268 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Archivo de Defunciones - Registro Civil</title>
+    <title>Archivo Central de Defunciones - Registro Civil</title>
     
     <!-- Librería de íconos Font Awesome 6 Premium Estables -->
     <link rel="stylesheet" href="https://cloudflare.com">
     
     <style>
-        /* REGLAS PARA SIMULAR UNA APP NATIVA (MOBILE-FIRST) */
+        /* CONFIGURACIÓN DE APLICACIÓN RESPONSIVA SMARTPHONE */
         body { 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            margin: 0; 
-            padding: 0; 
-            background-color: #f7fafc; 
-            color: #2d3748; 
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none; /* Evita selecciones accidentales al tocar la pantalla */
+            margin: 0; padding: 0; background-color: #f7fafc; color: #2d3748; 
+            display: flex; flex-direction: column; min-height: 100vh;
+            -webkit-tap-highlight-color: transparent; user-select: none;
         }
-
-        /* CONTENEDOR PRINCIPAL CON SCROLL INTERNO (EVITA REBOTE DE NAVEGADOR) */
         .app-container {
-            flex-grow: 1;
-            padding: 20px;
-            padding-bottom: 90px; /* Espacio de resguardo para la botonera inferior */
-            box-sizing: border-box;
-            overflow-y: auto;
-            max-width: 600px; /* Centrado perfecto tipo app en tablets o pantallas grandes */
-            margin: 0 auto;
-            width: 100%;
+            flex-grow: 1; padding: 20px; padding-bottom: 95px; box-sizing: border-box;
+            overflow-y: auto; max-width: 600px; margin: 0 auto; width: 100%;
         }
-        /* ENCABEZADO DE LA APP */
+
+        /* MARQUESINA INSTITUCIONAL */
         .app-header {
-            background-color: #1a365d; /* Azul Institucional Oscuro */
-            color: white;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            border-bottom-left-radius: 16px;
-            border-bottom-right-radius: 16px;
+            background-color: #1a365d; color: white; padding: 20px; text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;
         }
-        .app-header i {
-            font-size: 32px;
-            color: #63b3ed; /* Azul cielo para destacar los íconos */
-            margin-bottom: 8px;
-        }
-        .app-header h1 {
-            font-size: 18px;
-            margin: 0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .app-header p {
-            font-size: 12px;
-            margin: 4px 0 0 0;
-            color: #a0aec0;
-        }
+        .app-header i { font-size: 32px; color: #63b3ed; margin-bottom: 8px; }
+        .app-header h1 { font-size: 18px; margin: 0; text-transform: uppercase; letter-spacing: 1px; }
+        .app-header p { font-size: 12px; margin: 4px 0 0 0; color: #a0aec0; }
 
-        /* PANTALLAS (VISTAS INTERNAS DE LA APP) */
-        .app-screen {
-            display: none;
-            animation: fadeIn 0.25s ease-in-out;
-        }
-        .app-screen.active {
-            display: block;
-        }
+        /* NAVEGACIÓN SPA */
+        .app-screen { display: none; animation: fadeIn 0.25s ease-in-out; }
+        .app-screen.active { display: block; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-top: 15px; border: 1px solid #e2e8f0; }
 
-        /* TARJETAS FORMULARIOS Y RESULTADOS */
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-            margin-top: 15px;
-            border: 1px solid #e2e8f0;
-        }
-
-        /* ELEMENTOS DE FORMULARIO AGRANDADOS PARA PANTALLAS TÁCTILES */
-        label {
-            font-weight: 700;
-            display: block;
-            margin-top: 15px;
-            margin-bottom: 6px;
-            font-size: 13px;
-            color: #4a5568;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        label i {
-            font-size: 16px;
-            color: #3182ce;
-            margin-right: 6px;
-        }
-        input[type="text"], input[type="number"], select, textarea {
-            width: 100%;
-            padding: 14px; /* Más alto para facilitar el toque digital */
-            border: 1px solid #cbd5e0;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 15px;
-            background-color: #fff;
-            transition: all 0.2s ease;
-        }
-        input:focus, select:focus, textarea:focus {
-            border-color: #3182ce;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15);
-        }
-
-        /* BOTONES ESTILO NATIVO SMARTPHONE */
-        .btn {
-            background-color: #3182ce;
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-            margin-top: 20px;
-            box-shadow: 0 4px 10px rgba(49, 130, 206, 0.2);
-        }
-        .btn:active {
-            transform: scale(0.98);
-            background-color: #2b6cb0;
-        }
-        .btn-danger {
-            background-color: #e53e3e;
-            box-shadow: 0 4px 10px rgba(229, 62, 62, 0.2);
-        }
-        .btn-danger:active { background-color: #c53030; }
+        /* INPUTS ERGONÓMICOS TÁCTILES */
+        label { font-weight: 700; display: block; margin-top: 15px; margin-bottom: 6px; font-size: 13px; color: #4a5568; text-transform: uppercase; letter-spacing: 0.5px; }
+        label i { font-size: 16px; color: #3182ce; margin-right: 6px; }
         
-        .btn-secondary {
-            background-color: #718096;
-            box-shadow: 0 4px 10px rgba(113, 128, 150, 0.2);
+        input[type="text"], input[type="number"], select {
+            width: 100%; padding: 14px; border: 1px solid #cbd5e0; border-radius: 8px; box-sizing: border-box; font-size: 15px; background-color: #fff; transition: all 0.2s ease;
         }
+        input:focus, select:focus { border-color: #3182ce; outline: none; box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15); }
+
+        /* PALETA DE ACCIONES POR SEVERIDAD */
+        .btn {
+            background-color: #3182ce; color: white; border: none; width: 100%; padding: 15px; border-radius: 8px; font-size: 15px; font-weight: bold;
+            display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: background 0.2s, transform 0.1s; margin-top: 20px; box-shadow: 0 4px 10px rgba(49, 130, 206, 0.2);
+        }
+        .btn:active { transform: scale(0.98); background-color: #2b6cb0; }
+        .btn-danger { background-color: #e53e3e; box-shadow: 0 4px 10px rgba(229, 62, 62, 0.2); }
+        .btn-danger:active { background-color: #c53030; }
+        .btn-secondary { background-color: #718096; box-shadow: 0 4px 10px rgba(113, 128, 150, 0.2); }
         .btn-secondary:active { background-color: #4a5568; }
-        /* TARJETAS DE RESULTADOS EN BÚSQUEDA (CIUDADANOS) */
-        .result-item {
-            background: white;
-            border-radius: 10px;
-            padding: 16px;
-            margin-bottom: 12px;
-            border: 1px solid #e2e8f0;
-            border-left: 6px solid #4a5568; /* Gris por defecto */
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            position: relative;
-        }
-        /* Bordes de color según la empresa cochería para identificarlos visualmente rápido */
-        .result-item.bouchard { border-left-color: #3182ce; }   /* Azul Bouchard */
-        .result-item.cossani { border-left-color: #38a169; }    /* Verde Cossani */
-        .result-item.previsora { border-left-color: #d69e2e; }  /* Dorado Previsora */
 
-        .result-item h3 {
-            margin: 0;
-            font-size: 16px;
-            color: #1a202c;
-            text-transform: uppercase;
-        }
-        .result-item p {
-            margin: 2px 0;
-            font-size: 13.5px;
-            color: #4a5568;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .result-item p i {
-            width: 16px;
-            text-align: center;
-            color: #718096;
-            font-size: 14px;
-        }
+        /* RENDERS VISUALES DE ACTAS */
+        .result-item { background: white; border-radius: 10px; padding: 16px; margin-bottom: 12px; border: 1px solid #e2e8f0; border-left: 6px solid #4a5568; display: flex; flex-direction: column; gap: 6px; position: relative; }
+        .result-item.bouchard { border-left-color: #3182ce; }   
+        .result-item.cossani { border-left-color: #38a169; }    
+        .result-item.previsora { border-left-color: #d69e2e; }  
 
-        /* Botón de acceso directo a Drive en la tarjeta */
-        .btn-drive-link {
-            background-color: #38a169;
-            color: #fff;
-            padding: 10px 14px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: bold;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            width: fit-content;
-            margin-top: 8px;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.05);
-        }
-        .btn-drive-link i {
-            font-size: 15px;
-            color: #fff;
-        }
+        .result-item h3 { margin: 0; font-size: 16px; color: #1a202c; text-transform: uppercase; }
+        .result-item p { margin: 2px 0; font-size: 13.5px; color: #4a5568; display: flex; align-items: center; gap: 6px; }
+        .result-item p i { width: 16px; text-align: center; color: #718096; font-size: 14px; }
+        .btn-drive-link { background-color: #38a169; color: #fff; padding: 10px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold; display: inline-flex; align-items: center; gap: 6px; width: fit-content; margin-top: 8px; box-shadow: 0 3px 6px rgba(0,0,0,0.05); }
 
-        .actions-area {
-            display: flex;
-            gap: 6px;
-            justify-content: flex-end;
-            margin-top: 10px;
-            border-top: 1px solid #edf2f7;
-            padding-top: 10px;
-        }
-        .btn-mini {
-            padding: 6px 10px;
-            font-size: 12px;
-            min-width: auto;
-            width: auto;
-            margin: 0;
-        }
+        /* BARRA FIJA AL ALCANCE DEL PULGAR */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background-color: #ffffff; height: 70px; display: flex; box-shadow: 0 -4px 15px rgba(0,0,0,0.06); border-top: 1px solid #edf2f7; z-index: 1000; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #718096; font-size: 11px; font-weight: bold; text-decoration: none; gap: 4px; cursor: pointer; transition: color 0.15s; }
+        .nav-item i { font-size: 20px; }
+        .nav-item.active { color: #3182ce; }
 
-        /* BOTONERA INFERIOR (ESTILO APP NATIVA FLOTANTE) */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            background-color: #ffffff;
-            height: 70px;
-            display: flex;
-            box-shadow: 0 -4px 15px rgba(0,0,0,0.06);
-            border-top: 1px solid #edf2f7;
-            z-index: 1000;
-        }
-        .nav-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #718096;
-            font-size: 11px;
-            font-weight: bold;
-            text-decoration: none;
-            gap: 4px;
-            cursor: pointer;
-            transition: color 0.15s;
-        }
-        .nav-item i {
-            font-size: 20px;
-        }
-        .nav-item.active {
-            color: #3182ce;
-        }
-
-        /* EFECTO DE ANIMACIÓN SUAVE PARA PASAR PANTALLAS */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-<!-- Marco invisible receptor transaccional para saltear bloqueos CORS de red -->
-<iframe name="marcoOcultoGoogle" id="marcoOcultoGoogle" style="display:none;" onload="procesarRespuestaGoogle()"></iframe>
 <div class="app-header">
     <i class="fa-solid fa-box-archive"></i>
     <h1>Archivo de Defunciones</h1>
@@ -273,7 +85,7 @@
 
 <div class="app-container">
     
-    <!-- PANTALLA 1: BUSCADOR DE ACTAS -->
+    <!-- PANTALLA 1: BUSCADOR CENTRAL -->
     <div id="screenBuscar" class="app-screen active">
         <label for="searchBar"><i class="fa-solid fa-magnifying-glass"></i> Buscar por DNI o Apellido/Nombre:</label>
         <input type="text" id="searchBar" placeholder="Escribí para filtrar al instante..." oninput="buscarActas()">
@@ -287,22 +99,15 @@
                 <option value="general">📁 General / Otras Actas</option>
             </select>
         </div>
-
-        <div id="resultsCount" style="font-size: 12px; font-weight: bold; color: #718096; margin-top: 15px; text-transform: uppercase;">
-            Actas encontradas: 0
-        </div>
-
-        <div id="searchResultsContainer" style="margin-top: 10px;">
-            <!-- El mensaje de guía inicial limpio se inyecta dinámicamente mediante JavaScript -->
-        </div>
+        <div id="resultsCount" style="font-size: 12px; font-weight: bold; color: #718096; margin-top: 15px; text-transform: uppercase;">Actas encontradas: 0</div>
+        <div id="searchResultsContainer" style="margin-top: 10px;"></div>
     </div>
+
     <!-- PANTALLA 2: CARGAR NUEVA ACTA -->
     <div id="screenCargar" class="app-screen">
         <div class="card">
             <h2 style="margin-top:0; font-size: 16px; color: #1a365d; text-transform: uppercase; display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-file-circle-plus" style="color:#3182ce;"></i> Registrar Acta Digitalizada</h2>
             
-            <input type="hidden" id="editIndex" value="-1">
-
             <label for="actaDni"><i class="fa-solid fa-id-card"></i> N° de DNI del Fallecido:</label>
             <input type="number" id="actaDni" placeholder="Ej: 14234567" required>
 
@@ -330,49 +135,38 @@
         </div>
     </div>
 
-    <!-- PANTALLA 3: CONFIGURACIÓN Y RESPALDOS -->
+    <!-- PANTALLA 3: RESPALDOS Y ENTORNO -->
     <div id="screenConfig" class="app-screen">
         <div class="card">
             <h2 style="margin-top:0; font-size: 16px; color: #1a365d; text-transform: uppercase;"><i class="fa-solid fa-shield-halved" style="color:#3182ce;"></i> Resguardo de Información</h2>
             <p style="font-size: 13px; color: #4a5568; line-height: 1.5;">Toda la base de datos se aloja en tiempo real en la nube centralizada de la oficina.</p>
-            
             <button class="btn btn-secondary" onclick="exportarBaseDatos()"><i class="fa-solid fa-file-export"></i> Exportar Resguardo (JSON)</button>
-            
             <label for="importFile" style="background-color: #4a5568; color: white; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 12px;"><i class="fa-solid fa-file-import"></i> Importar Resguardo (JSON)</label>
             <input type="file" id="importFile" accept=".json" onchange="importarBaseDatos(event)" style="display: none;">
         </div>
-
         <div class="card" style="border-top: 4px solid #e53e3e;">
             <h2 style="margin-top:0; font-size: 16px; color: #c53030; text-transform: uppercase;"><i class="fa-solid fa-triangle-exclamation"></i> Zona de Peligro</h2>
-            <p style="font-size: 13px; color: #4a5568;">Esta acción borrará de manera definitiva todas las actas indexadas en la aplicación. Asegurate de tener una copia de resguardo.</p>
             <button class="btn btn-danger" onclick="eliminarTodaLaBase()"><i class="fa-solid fa-trash-can"></i> Borrar Toda la Base de Datos</button>
         </div>
     </div>
+</div>
 
-</div> <!-- Cierre de app-container -->
-
-<!-- BOTONERA INFERIOR FIJA (AL ALCANCE DEL PULGAR) -->
 <div class="bottom-nav">
     <div id="navBuscar" class="nav-item active" onclick="switchScreen('screenBuscar', this)"><i class="fa-solid fa-magnifying-glass"></i><span>Buscar</span></div>
     <div id="navCargar" class="nav-item" onclick="switchScreen('screenCargar', this)"><i class="fa-solid fa-file-circle-plus"></i><span>Cargar</span></div>
     <div id="navConfig" class="nav-item" onclick="switchScreen('screenConfig', this)"><i class="fa-solid fa-gears"></i><span>Resguardos</span></div>
 </div>
 <script>
-    // URL centralizada definitiva de tu Google Apps Script de producción actualizada por el usuario
-    const API_URL_SHEETS = "https://script.google.com/macros/s/AKfycbyWtYU1SYylzb1j0ASC1qSCq4GdsEiQ5ZTgMdMc0RHNsDxNyb6A-ZcnmVpDzgXQRnQMrw/exec";
+    // URL CENTRALIZADA DE PRODUCCIÓN ACTIVA CONECTADA A TU NUEVA PLANILLA
+    const API_URL_SHEETS = "https://google.com";
     
-    // Almacenamiento temporal en memoria para el filtrado reactivo
     let baseActasDefuncion = [];
-    
-    // Bandera de control de envío seguro para el marco oculto iframe
-    let enviandoFormulario = false;
 
-    // Función para alternar entre las vistas/pantallas de la aplicación (Efecto Nivel Nativo)
+    // Control de navegación interna SPA
     function switchScreen(screenId, navElement) {
         document.getElementById('screenBuscar').style.display = 'none';
         document.getElementById('screenCargar').style.display = 'none';
         document.getElementById('screenConfig').style.display = 'none';
-
         document.getElementById('navBuscar').classList.remove('active');
         document.getElementById('navCargar').classList.remove('active');
         document.getElementById('navConfig').classList.remove('active');
@@ -381,13 +175,14 @@
         if (targetScreen) targetScreen.style.display = 'block';
         if (navElement) navElement.classList.add('active');
 
-        if (screenId === 'screenCargar' && parseInt(document.getElementById('editIndex').value) === -1) {
+        if (screenId === 'screenCargar') {
             limpiarFormularioActas();
         } else if (screenId === 'screenBuscar') {
             buscarActas();
         }
     }
-    // Envío por formulario nativo virtual: Solución infalible contra bloqueos CORS de red
+
+    // Escritura por Inyección Dinámica (JSONP): Canal seguro libre de bloqueos CORS
     function guardarActa() {
         const dni = document.getElementById('actaDni').value.trim();
         const nombre = document.getElementById('actaNombre').value.trim().toUpperCase();
@@ -395,7 +190,6 @@
         const anio = document.getElementById('actaAnio').value.trim() || '2026';
         const categoria = document.getElementById('actaCategoria').value;
         const driveUrl = document.getElementById('actaDriveUrl').value.trim() || 'https://google.com';
-        const index = parseInt(document.getElementById('editIndex').value);
 
         if (!dni || !nombre) {
             alert('⚠️ Por favor complete el número de DNI y los Nombres/Apellidos del fallecido.');
@@ -405,47 +199,28 @@
         const btnGuardar = document.getElementById('btnGuardar');
         if (btnGuardar) {
             btnGuardar.disabled = true;
-            btnGuardar.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sincronizando con la nube...`;
-        }
-        
-        enviandoFormulario = true;
-
-        const formVirtual = document.createElement('form');
-        formVirtual.method = 'POST';
-        formVirtual.action = API_URL_SHEETS;
-        formVirtual.target = 'marcoOcultoGoogle';
-
-        const campos = { dni, nombre, numero, anio, categoria, driveUrl, editIndex: index };
-        
-        for (const clave in campos) {
-            const inputOculto = document.createElement('input');
-            inputOculto.type = 'hidden';
-            inputOculto.name = clave;
-            inputOculto.value = campos[clave];
-            formVirtual.appendChild(inputOculto);
+            btnGuardar.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Guardando en la nube...`;
         }
 
-        document.body.appendChild(formVirtual);
-        formVirtual.submit();
-        document.body.removeChild(formVirtual);
-    }
+        // Definición de respuesta global transaccional
+        window.respuestaGuardarGoogle = function(resultado) {
+            if (resultado.status === "success") {
+                alert('✨ Registro guardado con éxito en el archivo central.');
+                limpiarFormularioActas();
+                switchScreen('screenBuscar', document.getElementById('navBuscar'));
+            } else {
+                alert('⚠️ Ocurrió un inconveniente al intentar guardar el registro.');
+            }
+            if (btnGuardar) btnGuardar.disabled = false;
+            scriptTemp.remove();
+        };
 
-    // Se dispara cuando el iframe invisible acusa recibo del servidor de Google
-    function procesarRespuestaGoogle() {
-        if (!enviandoFormulario) return;
-        
-        const index = parseInt(document.getElementById('editIndex').value);
-        alert(index === -1 ? '✨ Registro subido con éxito al archivo central.' : '💾 Modificaciones impactadas correctamente.');
-        
-        enviandoFormulario = false;
-        
-        const btnGuardar = document.getElementById('btnGuardar');
-        if (btnGuardar) btnGuardar.disabled = false;
-        
-        limpiarFormularioActas();
-        switchScreen('screenBuscar', document.getElementById('navBuscar'));
+        // Construir inyección temporal independiente para el despacho
+        const scriptTemp = document.createElement('script');
+        scriptTemp.src = API_URL_SHEETS + "?accion=guardar&dni=" + encodeURIComponent(dni) + "&nombre=" + encodeURIComponent(nombre) + "&numero=" + encodeURIComponent(numero) + "&anio=" + encodeURIComponent(anio) + "&categoria=" + encodeURIComponent(categoria) + "&driveUrl=" + encodeURIComponent(driveUrl) + "&callback=respuestaGuardarGoogle";
+        document.body.appendChild(scriptTemp);
     }
-    // Buscador adaptativo con inyección Script Tag (JSONP) - Libre de bloqueos de red
+    // Lectura por Inyección Dinámica (JSONP) libre de restricciones CORS
     function buscarActas() {
         const container = document.getElementById('searchResultsContainer');
         const countIndicator = document.getElementById('resultsCount');
@@ -468,20 +243,19 @@
         const scriptViejo = document.getElementById('jsonpScriptGoogle');
         if (scriptViejo) scriptViejo.remove(); 
 
-        // Manejador global que captura los datos descargados sin restricciones CORS
         window.procesarDatosDesdeGoogle = function(datosNube) {
             baseActasDefuncion = datosNube;
             container.innerHTML = '';
             let contador = 0;
 
-            baseActasDefuncion.forEach((acta, originalIndex) => {
+            baseActasDefuncion.forEach((acta) => {
                 const cumpleCategoria = (categoriaFiltro === 'todos' || acta.categoria === categoriaFiltro);
                 const cumpleTexto = (acta.dni.includes(query) || acta.nombre.toLowerCase().includes(query));
 
                 if (cumpleCategoria && cumpleTexto) {
                     contador++;
                     const div = document.createElement('div');
-                    div.className = `result-item ${acta.categoria}`;
+                    div.className = "result-item " + acta.categoria;
 
                     let textoCat = "General / Otras";
                     if (acta.categoria === 'bouchard') textoCat = "BOUCHARD v03022026";
@@ -489,50 +263,28 @@
                     if (acta.categoria === 'previsora') textoCat = "PREVISORA v03022026";
 
                     div.innerHTML = `
-                        <h3>${acta.nombre}</h3>
-                        <p><i class="fa-solid fa-id-card"></i> <strong>DNI:</strong> ${acta.dni}</p>
-                        <p><i class="fa-solid fa-hashtag"></i> <strong>Datos:</strong> ${acta.numero}</p>
-                        <p><i class="fa-solid fa-calendar-day"></i> <strong>Año Defunción:</strong> ${acta.anio}</p>
-                        <p><i class="fa-solid fa-building"></i> <strong>Carpeta:</strong> ${textoCat}</p>
-                        <a href="${acta.driveUrl}" class="btn-drive-link" target="_blank"><i class="fa-brands fa-google-drive"></i> Abrir Acta Digital</a>
-                        <div class="actions-area">
-                            <button class="btn btn-mini btn-secondary" onclick="prepararEdicionActa(${originalIndex})"><i class="fa-solid fa-pen-to-square"></i> Editar</button>
-                        </div>
+                        <h3>` + acta.nombre + `</h3>
+                        <p><i class="fa-solid fa-id-card"></i> <strong>DNI:</strong> ` + acta.dni + `</p>
+                        <p><i class="fa-solid fa-hashtag"></i> <strong>Datos:</strong> ` + acta.numero + `</p>
+                        <p><i class="fa-solid fa-calendar-day"></i> <strong>Año Defunción:</strong> ` + acta.anio + `</p>
+                        <p><i class="fa-solid fa-building"></i> <strong>Carpeta:</strong> ` + textoCat + `</p>
+                        <a href="` + acta.driveUrl + `" class="btn-drive-link" target="_blank"><i class="fa-brands fa-google-drive"></i> Abrir Acta Digital</a>
                     `;
                     container.appendChild(div);
                 }
             });
 
-            countIndicator.textContent = `Actas encontradas: ${contador}`;
-
+            countIndicator.textContent = "Actas encontradas: " + contador;
             if (contador === 0) {
-                container.innerHTML = `
-                    <div style="text-align:center; color:#718096; padding:30px; font-style:italic;">
-                        <i class="fa-solid fa-folder-open" style="font-size:36px; margin-bottom:10px; display:block; color:#cbd5e0;"></i>
-                        No se encontraron actas digitalizadas que coincidan con la búsqueda.
-                    </div>
-                `;
+                container.innerHTML = `<div style="text-align:center; color:#718096; padding:30px; font-style:italic;"><i class="fa-solid fa-folder-open" style="font-size:36px; margin-bottom:10px; display:block; color:#cbd5e0;"></i>No se encontraron actas digitalizadas que coincidan.</div>`;
             }
+            nuevoScript.remove();
         };
 
         const nuevoScript = document.createElement('script');
         nuevoScript.id = 'jsonpScriptGoogle';
-        nuevoScript.src = API_URL_SHEETS + "?callback=procesarDatosDesdeGoogle";
+        nuevoScript.src = API_URL_SHEETS + "?accion=leer&callback=procesarDatosDesdeGoogle";
         document.body.appendChild(nuevoScript);
-    }
-    function prepararEdicionActa(index) {
-        const acta = baseActasDefuncion[index];
-        if (!acta) return;
-        document.getElementById('actaDni').value = acta.dni;
-        document.getElementById('actaNombre').value = acta.nombre;
-        document.getElementById('actaNumero').value = acta.numero;
-        document.getElementById('actaAnio').value = acta.anio;
-        document.getElementById('actaCategoria').value = acta.categoria;
-        document.getElementById('actaDriveUrl').value = acta.driveUrl === "https://google.com" ? "" : acta.driveUrl;
-        document.getElementById('editIndex').value = index;
-        const btn = document.getElementById('btnGuardar');
-        if (btn) { btn.innerHTML = '<i class="fa-solid fa-file-pen"></i> Guardar Cambios'; btn.style.backgroundColor = '#d69e2e'; }
-        switchScreen('screenCargar', document.getElementById('navCargar'));
     }
 
     function limpiarFormularioActas() {
@@ -542,9 +294,8 @@
         document.getElementById('actaAnio').value = '2026';
         document.getElementById('actaCategoria').value = 'general';
         document.getElementById('actaDriveUrl').value = '';
-        document.getElementById('editIndex').value = '-1';
         const btn = document.getElementById('btnGuardar');
-        if (btn) { btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Acta en Registro'; btn.style.backgroundColor = '#3182ce'; }
+        if (btn) { btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Acta en Registro'; }
     }
 
     function exportarBaseDatos() {
@@ -558,15 +309,57 @@
         downloadAnchor.remove();
     }
 
-    async function eliminarTodaLaBase() {
-        if (confirm('🚨 ¡ATENCIÓN CRÍTICA!\n\n¿Desea borrar todo el archivo?')) {
-            const contraseña = prompt('Escriba "Bella Vista":');
+    async function importarBaseDatos(event) {
+        const input = event.target;
+        if (!input.files || input.files.length === 0) return;
+
+        const archivo = input.files;
+        const lector = new FileReader();
+
+        lector.onload = async function(e) {
+            let datosImportados = [];
+            try { datosImportados = JSON.parse(e.target.result); } catch (err) { alert('❌ El archivo seleccionado es inválido.'); return; }
+
+            if (Array.isArray(datosImportados) && datosImportados.length > 0) {
+                if (confirm('Se detectaron ' + datosImportados.length + ' actas. ¿Desea subirlas de forma masiva a la nube de la oficina?')) {
+                    alert('Subiendo registros en segundo plano. Esto puede demorar unos instantes...');
+                    
+                    for(let i = 0; i < datosImportados.length; i++) {
+                        let item = datosImportados[i];
+                        if (item.dni && item.nombre) {
+                            const scriptBatch = document.createElement('script');
+                            scriptBatch.src = API_URL_SHEETS + "?accion=guardar&dni=" + encodeURIComponent(item.dni) + "&nombre=" + encodeURIComponent(item.nombre) + "&numero=" + encodeURIComponent(item.numero || '-') + "&anio=" + encodeURIComponent(item.anio || '2026') + "&categoria=" + encodeURIComponent(item.categoria || 'general') + "&driveUrl=" + encodeURIComponent(item.driveUrl || 'https://google.com') + "&callback=String";
+                            document.body.appendChild(scriptBatch);
+                            await new Promise(r => setTimeout(r, 400)); // Delay seguro anti colisiones
+                            scriptBatch.remove();
+                        }
+                    }
+                    alert('¡Importación en masa finalizada!');
+                    buscarActas();
+                }
+            } else {
+                alert('⚠️ El archivo de resguardo está vacío.');
+            }
+        };
+        lector.readAsText(archivo);
+        input.value = '';
+    }
+
+    function eliminarTodaLaBase() {
+        if (confirm('🚨 ¡ATENCIÓN CRÍTICA!\n\n¿Está completamente seguro de borrar de forma definitiva todo el archivo central?')) {
+            const contraseña = prompt('Escriba la frase de confirmación ("Bella Vista"):');
             if (contraseña && contraseña.toLowerCase() === 'bella vista') {
-                await fetch(API_URL_SHEETS + "?clear=true", { method: 'GET' });
-                baseActasDefuncion = [];
-                buscarActas();
-                alert('🔥 Base de datos eliminada.');
-                switchScreen('screenBuscar', document.getElementById('navBuscar'));
+                window.respuestaPurgarGoogle = function(res) {
+                    alert('🔥 Toda la base de datos remota ha sido eliminada por completo.');
+                    baseActasDefuncion = [];
+                    buscarActas();
+                    scriptPurge.remove();
+                };
+                const scriptPurge = document.createElement('script');
+                scriptPurge.src = API_URL_SHEETS + "?accion=purgar&callback=respuestaPurgarGoogle";
+                document.body.appendChild(scriptPurge);
+            } else {
+                alert('❌ Confirmación incorrecta.');
             }
         }
     }
