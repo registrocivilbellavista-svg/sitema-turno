@@ -36,43 +36,95 @@
 
         @media (min-width: 768px) { h1 { font-size: 2rem; } }
 
-        /* Botón de Apertura de Formulario */
-        .btn-toggle-upload {
-            background-color: #2b6cb0;
-            color: #ffffff;
-            border: 1px solid #3182ce;
-            border-radius: 50px;
-            padding: 14px 28px;
+        /* Panel de Autenticación con Desplegable Pre-cargado */
+        .auth-container {
+            width: 100%;
+            max-width: 600px;
+            background-color: #222630;
+            border: 1px solid #323946;
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .auth-title {
+            margin: 0 0 5px 0;
             font-size: 1rem;
             font-weight: 600;
             text-transform: uppercase;
-            cursor: pointer;
-            display: inline-flex;
+            color: #a0aec0;
+            display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-            transition: all 0.2s ease;
+            gap: 8px;
         }
 
-        .btn-toggle-upload:hover, .btn-toggle-upload:active {
-            background-color: #3182ce;
-            transform: scale(1.02);
+        .auth-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        .btn-toggle-upload svg {
-            width: 20px;
-            height: 20px;
-            fill: currentColor;
+        @media (min-width: 480px) {
+            .auth-grid { flex-direction: row; }
         }
 
-        /* Formulario Colapsable */
+        .auth-select {
+            background-color: #2a2f3b;
+            border: 1px solid #323946;
+            border-radius: 8px;
+            padding: 12px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .auth-input {
+            flex: 1;
+            background-color: #2a2f3b;
+            border: 1px solid #323946;
+            border-radius: 8px;
+            padding: 12px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .btn-auth {
+            background-color: #2b6cb0;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-auth:hover { background-color: #3182ce; }
+
+        .auth-status {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #cbd5e0;
+            margin-top: 5px;
+            padding-top: 8px;
+            border-top: 1px solid #2d3342;
+        }
+
+        /* Formulario Colapsable de Subida */
         .upload-wrapper {
             width: 100%;
             max-width: 600px;
             display: none;
             animation: deslizarAbajo 0.3s ease-out;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         @keyframes deslizarAbajo {
@@ -125,8 +177,6 @@
             box-sizing: border-box;
         }
 
-        .form-control:focus { border-color: #4a5568; }
-
         .btn-submit {
             background-color: #42b873;
             color: #ffffff;
@@ -138,12 +188,7 @@
             text-transform: uppercase;
             cursor: pointer;
             width: 100%;
-            transition: background-color 0.2s;
-            margin-top: 10px;
         }
-
-        .btn-submit:hover { background-color: #2f8f57; }
-        .btn-submit:disabled { opacity: 0.4; cursor: not-allowed; }
 
         /* Buscador */
         .search-container {
@@ -200,18 +245,33 @@
         .badge-cossani { background-color: rgba(66, 184, 115, 0.15); color: #42b873; border: 1px solid rgba(66, 184, 115, 0.3); }
         .badge-previsora { background-color: rgba(168, 82, 156, 0.15); color: #a8529c; border: 1px solid rgba(168, 82, 156, 0.3); }
 
+        /* Botón Descarga Activo */
         .btn-open {
-            color: #a0aec0;
+            color: #ffffff;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             width: 42px; height: 42px;
             border-radius: 50%;
-            background-color: #2a2f3b; border: 1px solid #323946;
+            background-color: #2f8f57; /* Verde */
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
         }
         .btn-open svg { width: 18px; height: 18px; fill: currentColor; }
-        .btn-open:hover, .btn-open:active { background-color: #ffffff; color: #1e222b; border-color: #ffffff; }
+
+        /* Icono Candado Bloqueado */
+        .btn-locked {
+            color: #718096;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            background-color: #2a2f3b;
+            border: 1px solid #323946;
+        }
+        .btn-locked svg { width: 18px; height: 18px; fill: currentColor; }
 
         .pagination-container { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 20px; }
         .btn-page { background-color: #2a2f3b; border: 1px solid #323946; color: #ffffff; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; }
@@ -227,30 +287,37 @@
         <h1>BIENVENIDOS AL SISTEMA DE DESCARGAS DE ACTAS DEFUNCION DEL REGISTRO CIVIL DE BELLA VISTA CORRIENTES</h1>
     </div>
 
-    <!-- Botón desplegable -->
-    <button class="btn-toggle-upload" onclick="toggleFormularioCarga()">
-        <svg viewBox="0 0 24 24">
-            <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-1 8h-3v3h-2v-3h-3v-2h3V9h2v3h3v2z"/>
-        </svg>
-        <span>Subir Acta Nueva</span>
-    </button>
+    <!-- Panel de Autenticación con Desplegable de Usuarios Pre-cargados -->
+    <div class="auth-container">
+        <div class="auth-title">
+            <svg style="width:16px; height:16px; fill:currentColor;" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+            <span>Selección de Operario y Autenticación</span>
+        </div>
+        <div class="auth-grid">
+            <!-- Menú Desplegable Pre-cargado -->
+            <select id="selectPerfil" class="auth-select">
+                <option value="bouchard">Empresa Fúnebre: BOUCHARD</option>
+                <option value="cossani">Empresa Fúnebre: COSSANI</option>
+                <option value="previsora">Empresa Fúnebre: PREVISORA</option>
+                <option value="admin">Administrador: REGISTRO CIVIL</option>
+            </select>
+            <input type="password" id="inputClave" class="auth-input" placeholder="Ingresá tu contraseña asignada...">
+            <button class="btn-auth" onclick="validarCredenciales()">Ingresar</button>
+        </div>
+        <div class="auth-status" id="textoEstadoAuth">Modo de consulta pública (Descargas inhabilitadas)</div>
+    </div>
 
-    <!-- Formulario Colapsable -->
+    <!-- Formulario de Subida Directa -->
     <div class="upload-wrapper" id="panelCarga">
         <div class="upload-container">
-            <div class="upload-title">Formulario de Carga Directa</div>
+            <div class="upload-title">Formulario de Carga Directa (Autorizado)</div>
             <form id="uploadForm" onsubmit="prepararYEnviar(event)">
                 <div class="form-group">
                     <label>Nombre y Apellido del Fallecido</label>
                     <input type="text" id="uploadNombre" class="form-control" placeholder="Ej: JUAN CARLOS GOMEZ" required>
                 </div>
-                <div class="form-group">
-                    <label>Empresa de Cobertura</label>
-                    <select id="uploadEmpresa" class="form-control" required>
-                        <option value="bouchard">Bouchard</option>
-                        <option value="cossani">Cossani</option>
-                        <option value="previsora">Previsora</option>
-                    </select>
+                <div class="form-group" style="display:none;">
+                    <input type="text" id="uploadEmpresa">
                 </div>
                 <div class="form-group">
                     <label>Seleccionar Archivo (PDF)</label>
@@ -261,12 +328,13 @@
         </div>
     </div>
 
-    <!-- Buscador -->
+    <!-- Buscador Principal -->
     <div class="search-container">
         <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
         <input type="text" id="inputBuscar" class="search-input" placeholder="Buscar fallecido..." onkeyup="ejecutarBusqueda()" disabled>
     </div>
-    <!-- Tabla de Registros -->
+
+    <!-- Contenedor de la Grilla de Actas -->
     <div class="table-container">
         <div id="loadingState" class="loading">Cargando actas desde Drive...</div>
         <table id="tablaActas" style="display: none;">
@@ -282,8 +350,7 @@
         </table>
         <div class="no-results" id="sinResultados">No se encontraron coincidencias.</div>
     </div>
-
-    <!-- Controles de Paginación de a 10 -->
+    <!-- Controles de Paginación -->
     <div class="pagination-container" id="controlPaginacion" style="display: none;">
         <button class="btn-page" id="btnAnterior" onclick="cambiarPagina(-1)">Anterior</button>
         <span class="page-info" id="infoPagina">Página 1 de 1</span>
@@ -294,28 +361,51 @@
         // URL DE TU GOOGLE APPS SCRIPT (REEMPLAZÁ ESTA URL POR LA TUYA QUE TERMINA EN /exec)
         const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbyiNzg5-zBoVxTetGnBLhWe7f0fSyupt6ZGqCvM71GpT_gulZlFTGSsbzKC2V_TQNXXaA/exec";
         
+        // MATRIZ DE CONTRASEÑAS ENLAZADAS AL SELECTOR PRE-CARGADO
+        const PERMISOS_SISTEMA = {
+            bouchard: "bouchard123",
+            cossani: "cossani123",
+            previsora: "previsora123",
+            admin: "felipe" // CLAVE MAESTRA PARA CONTROL TOTAL DEL REGISTRO CIVIL
+        };
+
         let todasLasActas = [];
         let actasFiltradas = [];
         let paginaActual = 1;
         const registrosPorPagina = 10;
+        let operarioActivo = "ninguno"; 
 
-        function toggleFormularioCarga() {
-            const panel = document.getElementById("panelCarga");
-            if (panel.style.display === "none" || panel.style.display === "") {
-                panel.style.display = "block";
-                panel.scrollIntoView({ behavior: 'smooth' });
+        // Valida la clave contrastándola con la opción elegida en el menú desplegable
+        function validarCredenciales() {
+            const perfilSeleccionado = document.getElementById("selectPerfil").value;
+            const claveIngresada = document.getElementById("inputClave").value;
+            const textoEstado = document.getElementById("textoEstadoAuth");
+            const panelCarga = document.getElementById("panelCarga");
+            
+            if (claveIngresada === PERMISOS_SISTEMA[perfilSeleccionado]) {
+                operarioActivo = perfilSeleccionado;
+                
+                if (perfilSeleccionado === "admin") {
+                    textoEstado.innerHTML = "👑 Conectado como: <strong style='color:#3182ce;'>ADMINISTRADOR CIVIL (Control Total)</strong>. Descargas abiertas.";
+                    panelCarga.style.display = "none";
+                } else {
+                    textoEstado.innerHTML = `🟢 Conectado como fúnebre: <strong style='text-transform:uppercase;'>${perfilSeleccionado}</strong>. Subidas y descargas habilitadas.`;
+                    panelCarga.style.display = "block";
+                    document.getElementById("uploadEmpresa").value = perfilSeleccionado;
+                }
             } else {
-                panel.style.display = "none";
+                operarioActivo = "ninguno";
+                textoEstado.innerHTML = "❌ Contraseña inválida para el operario seleccionado.";
+                panelCarga.style.display = "none";
+                alert("La contraseña ingresada no coincide con el perfil seleccionado.");
             }
+            
+            renderizarTabla(); // Refresca las celdas aplicando los candados o botones verdes en el acto
         }
 
-        // Consulta sincrónica limpia para la visualización inmediata de datos
         async function cargarActasDesdeDrive() {
             try {
                 document.getElementById("loadingState").style.display = "block";
-                document.getElementById("loadingState").innerText = "Sincronizando con Google Drive...";
-                document.getElementById("tablaActas").style.display = "none";
-                
                 const respuesta = await fetch(URL_SCRIPT);
                 todasLasActas = await respuesta.json();
                 actasFiltradas = [...todasLasActas];
@@ -327,7 +417,7 @@
                 paginaActual = 1;
                 renderizarTabla();
             } catch (error) {
-                document.getElementById("loadingState").innerText = "Error de conexión con los datos de Google Drive.";
+                document.getElementById("loadingState").innerText = "Error de conexión con Google Drive.";
             }
         }
 
@@ -350,12 +440,25 @@
 
             bloque.forEach(acta => {
                 const fila = document.createElement("tr");
-                fila.innerHTML = `
-                    <td style="text-align: center;">
+                let celdaBoton = "";
+
+                // Evaluación de Privacidad
+                if (operarioActivo === "admin" || operarioActivo === acta.empresa) {
+                    celdaBoton = `
                         <a href="${acta.link}" target="_self" class="btn-open" title="Descargar acta">
                             <svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg>
                         </a>
-                    </td>
+                    `;
+                } else {
+                    celdaBoton = `
+                        <div class="btn-locked" title="Acceso restringido">
+                            <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                        </div>
+                    `;
+                }
+
+                fila.innerHTML = `
+                    <td style="text-align: center;">${celdaBoton}</td>
                     <td style="font-weight: 500;">${acta.nombre}</td>
                     <td><span class="badge badge-${acta.empresa}">${acta.empresa}</span></td>
                     <td class="col-fecha">${acta.fechaTexto}</td>
@@ -382,11 +485,10 @@
             renderizarTabla();
         }
 
-        // Subida directa nativa compatible con la API de Google Apps Script sin romper el formato JSON
         function prepararYEnviar(event) {
             event.preventDefault();
             const btn = document.getElementById("btnSubir");
-            const archivoInput = document.getElementById("uploadFile").files[0];
+            const archivoInput = document.getElementById("uploadFile").files;
             const nombre = document.getElementById("uploadNombre").value;
             const empresa = document.getElementById("uploadEmpresa").value;
 
@@ -398,7 +500,7 @@
             const lector = new FileReader();
             lector.onload = async function(e) {
                 const fragmentos = e.target.result.split(',');
-                const base64Limpio = fragmentos[1]; // Extrae la cadena de texto plano Base64 pura de la posición número 1
+                const base64Limpio = fragmentos[1];
                 
                 const payload = {
                     nombre: nombre,
@@ -407,26 +509,21 @@
                 };
 
                 try {
-                    // Petición POST nativa asincrónica (Evita la inyección rota del formVirtual)
                     const respuesta = await fetch(URL_SCRIPT, {
                         method: "POST",
                         body: JSON.stringify(payload),
-                        headers: {
-                            "Content-Type": "text/plain;charset=utf-8" // Forzar texto plano compatible con Google Apps Script
-                        }
+                        headers: { "Content-Type": "text/plain;charset=utf-8" }
                     });
                     const resultado = await respuesta.json();
-                    
                     if (resultado.resultado === "OK") {
-                        alert("¡Acta subida con éxito a Google Drive!");
+                        alert("¡Acta subida con éxito!");
                         document.getElementById("uploadForm").reset();
-                        document.getElementById("panelCarga").style.display = "none"; 
-                        cargarActasDesdeDrive(); // Refresca automáticamente la cuadrícula de a 10
+                        cargarActasDesdeDrive();
                     } else {
-                        alert("Error del servidor: " + resultado.mensaje);
+                        alert("Error: " + resultado.mensaje);
                     }
                 } catch (err) {
-                    alert("Error en la carga directa de datos. Verificá tu URL.");
+                    alert("Error en el envío.");
                 } finally {
                     btn.disabled = false;
                     btn.innerText = "Confirmar y Subir a Drive";
