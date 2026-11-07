@@ -11,7 +11,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: #1e222b; /* Fondo oscuro institucional */
             margin: 0;
-            padding: 20px;
+            padding: 12px; /* Margen reducido para pantallas móviles */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -22,13 +22,13 @@
 
         .header-container {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         h1 {
             color: #ffffff;
-            margin: 0 0 10px 0;
-            font-size: 2.2rem;
+            margin: 0 0 5px 0;
+            font-size: 1.8rem; /* Tamaño adaptado a celular */
             letter-spacing: 0.5px;
             text-transform: uppercase;
         }
@@ -36,34 +36,34 @@
         p {
             color: #a0aec0;
             margin: 0;
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
-        /* Buscador Inteligente */
+        /* Buscador Inteligente optimizado para celular */
         .search-container {
             width: 100%;
             max-width: 600px;
-            margin-bottom: 40px;
+            margin-bottom: 25px;
             position: relative;
         }
 
         .search-container i {
             position: absolute;
-            left: 20px;
+            left: 18px;
             top: 50%;
             transform: translateY(-50%);
             color: #718096;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
         }
 
         .search-input {
             width: 100%;
-            padding: 16px 20px 16px 55px;
+            padding: 14px 15px 14px 48px;
             background-color: #2a2f3b;
             border: 2px solid #323946;
             border-radius: 50px;
             color: #ffffff;
-            font-size: 1.1rem;
+            font-size: 1rem;
             outline: none;
             box-sizing: border-box;
             transition: all 0.3s ease;
@@ -73,43 +73,44 @@
         .search-input:focus {
             border-color: #4a5568;
             background-color: #2d3342;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
         }
 
-        /* Tabla de Actas */
+        /* Tabla Adaptable con desplazamiento horizontal en móviles extremos */
         .table-container {
             width: 100%;
             max-width: 950px;
             background-color: #222630;
             border: 1px solid #323946;
-            border-radius: 16px;
+            border-radius: 14px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            overflow: hidden;
+            overflow-x: auto; /* Permite scroll si la pantalla es muy chica */
             position: relative;
             min-height: 150px;
+            -webkit-overflow-scrolling: touch;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             text-align: left;
+            min-width: 500px; /* Evita que las columnas colapsen en pantallas chicas */
         }
 
         th {
             background-color: #2a2f3b;
             color: #a0aec0;
-            padding: 16px 20px;
+            padding: 14px 12px;
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             letter-spacing: 0.5px;
             border-bottom: 1px solid #323946;
         }
 
         td {
-            padding: 14px 20px;
+            padding: 12px 12px;
             border-bottom: 1px solid #2d3342;
-            font-size: 1rem;
+            font-size: 0.95rem;
         }
 
         tr:hover td {
@@ -118,15 +119,16 @@
 
         .col-fecha {
             color: #cbd5e0;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            white-space: nowrap; /* Evita que la fecha se divida en dos renglones */
         }
 
-        /* Etiquetas de las Empresas */
+        /* Etiquetas de las Empresas comprimidas */
         .badge {
             display: inline-block;
-            padding: 6px 12px;
+            padding: 4px 10px;
             border-radius: 20px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -136,33 +138,32 @@
         .badge-cossani { background-color: rgba(66, 184, 115, 0.15); color: #42b873; border: 1px solid rgba(66, 184, 115, 0.3); }
         .badge-previsora { background-color: rgba(168, 82, 156, 0.15); color: #a8529c; border: 1px solid rgba(168, 82, 156, 0.3); }
 
-        /* Botón Ver Acta */
+        /* Botón Ver Acta agrandado para zona táctil móvil */
         .btn-open {
-            color: #718096;
+            color: #ffffff;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 36px;
-            height: 36px;
+            width: 42px; /* Más grande para el dedo */
+            height: 42px;
             border-radius: 50%;
-            background-color: #2a2f3b;
-            border: 1px solid #323946;
-            transition: all 0.2s ease;
+            background-color: #3182ce; /* Azul más llamativo para móviles */
+            border: none;
+            transition: transform 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        .btn-open:hover {
-            background-color: #ffffff;
-            color: #1e222b;
-            transform: scale(1.05);
+        .btn-open:active {
+            transform: scale(0.9);
+            background-color: #2b6cb0;
         }
 
-        /* Estados de Carga y Mensajes */
         .loading {
             padding: 40px;
             text-align: center;
             color: #a0aec0;
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
         .no-results {
@@ -170,7 +171,7 @@
             padding: 40px;
             text-align: center;
             color: #718096;
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
     </style>
 </head>
@@ -178,92 +179,91 @@
 
     <div class="header-container">
         <h1>SISTEMA DE DEFUNCIONES</h1>
-        <p>Registro Civil Bella Vista - Sincronización Automática con Google Drive</p>
+        <p>Registro Civil Bella Vista</p>
     </div>
 
     <!-- Buscador en tiempo real -->
     <div class="search-container">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" id="inputBuscar" class="search-input" placeholder="Buscar fallecido por nombre o apellido..." onkeyup="filtrarActas()" disabled>
+        <input type="text" id="inputBuscar" class="search-input" placeholder="Buscar fallecido..." onkeyup="filtrarActas()" disabled>
     </div>
     <!-- Contenedor de la Tabla -->
     <div class="table-container">
         <div id="loadingState" class="loading">
-            <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 2rem; margin-bottom: 15px; display: block; color: #5285c5;"></i>
-            Conectando con Google Drive y cargando actas vigentes...
+            <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 1.8rem; margin-bottom: 12px; display: block; color: #5285c5;"></i>
+            Cargando actas desde Drive...
         </div>
 
         <table id="tablaActas" style="display: none;">
             <thead>
                 <tr>
+                    <th style="text-align: center; width: 60px;">Ver</th>
                     <th>Fallecido (Nombre Completo)</th>
-                    <th>Empresa Cobertura</th>
-                    <th>Última Actualización</th>
-                    <th style="text-align: center; width: 80px;">Ver Acta</th>
+                    <th>Empresa</th>
+                    <th>Actualizado</th>
                 </tr>
             </thead>
             <tbody id="cuerpoTabla">
-                <!-- Los renglones ordenados por fecha se generan automáticamente -->
+                <!-- Los renglones se generan con el botón a la izquierda -->
             </tbody>
         </table>
 
         <div class="no-results" id="sinResultados">
-            <i class="fa-solid fa-folder-open" style="font-size: 2.5rem; margin-bottom: 10px; display: block;"></i>
-            No se encontraron actas que coincidan con el criterio ingresado.
+            <i class="fa-solid fa-folder-open" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+            No se encontraron coincidencias.
         </div>
     </div>
 
     <script>
         // URL DE TU GOOGLE APPS SCRIPT (REEMPLAZÁ ESTA URL POR LA TUYA)
-        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbx1PgdBYUFe0nfN3wE43nibAtTFhi3mBTPDo8GB6W8VXarRnXa-RAOV6uEXtwQWcVO-0w/exec";
+        const URL_SCRIPT = "COPIA_AQUI_LA_URL_DE_TU_APPS_SCRIPT";
         
         let todasLasActas = [];
 
-        // Función para consultar a Google Drive de forma automática al abrir la página
+        // Consulta automática a Google Drive
         async function cargarActasDesdeDrive() {
             try {
                 const respuesta = await fetch(URL_SCRIPT);
                 todasLasActas = await respuesta.json();
                 
                 const cuerpoTabla = document.getElementById("cuerpoTabla");
-                cuerpoTabla.innerHTML = ""; // Limpiar spinner de carga
+                cuerpoTabla.innerHTML = ""; 
                 
                 if(todasLasActas.length === 0) {
-                    document.getElementById("loadingState").innerHTML = "No se encontraron archivos en las carpetas vinculadas.";
+                    document.getElementById("loadingState").innerHTML = "No se encontraron archivos.";
                     return;
                 }
 
-                // Generar dinámicamente cada fila (Vienen ordenadas por fecha más reciente desde Drive)
+                // Generar filas poniendo el botón Ver al principio (izq)
                 todasLasActas.forEach(acta => {
                     const fila = document.createElement("tr");
                     fila.className = "acta-row";
                     
                     fila.innerHTML = `
-                        <td>${acta.nombre}</td>
-                        <td><span class="badge badge-${acta.empresa}">${acta.empresa}</span></td>
-                        <td class="col-fecha">${acta.fechaTexto}</td>
                         <td style="text-align: center;">
                             <a href="${acta.link}" target="_self" class="btn-open">
                                 <i class="fa-solid fa-file-pdf"></i>
                             </a>
                         </td>
+                        <td style="font-weight: 500;">${acta.nombre}</td>
+                        <td><span class="badge badge-${acta.empresa}">${acta.empresa}</span></td>
+                        <td class="col-fecha">${acta.fechaTexto}</td>
                     `;
                     cuerpoTabla.appendChild(fila);
                 });
 
-                // Activar componentes visuales ocultos
                 document.getElementById("loadingState").style.display = "none";
                 document.getElementById("tablaActas").style.display = "table";
                 document.getElementById("inputBuscar").disabled = false;
-                document.getElementById("inputBuscar").placeholder = "Escribí para buscar entre las " + todasLasActas.length + " actas detectadas...";
+                document.getElementById("inputBuscar").placeholder = "Buscar entre " + todasLasActas.length + " actas...";
 
             } catch (error) {
-                console.error("Error cargando actas:", error);
-                document.getElementById("loadingState").innerHTML = "<i class='fa-solid fa-triangle-exclamation' style='color:#e53e3e; font-size:2rem; margin-bottom:10px; display:block;'></i> Error de conexión con el servidor de datos.";
+                console.error("Error:", error);
+                document.getElementById("loadingState").innerHTML = "Error de conexión con los datos.";
             }
         }
 
-        // Buscador interno instantáneo
+        // Buscador interno
         function filtrarActas() {
             const filter = document.getElementById("inputBuscar").value.toUpperCase();
             const rows = document.getElementsByClassName("acta-row");
@@ -290,7 +290,6 @@
             }
         }
 
-        // Iniciar carga automática al abrir la web
         window.onload = cargarActasDesdeDrive;
     </script>
 
