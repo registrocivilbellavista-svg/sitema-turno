@@ -350,7 +350,7 @@
         </table>
         <div class="no-results" id="sinResultados">No se encontraron coincidencias.</div>
     </div>
-    <!-- Controles de Paginación -->
+        <!-- Controles de Paginación -->
     <div class="pagination-container" id="controlPaginacion" style="display: none;">
         <button class="btn-page" id="btnAnterior" onclick="cambiarPagina(-1)">Anterior</button>
         <span class="page-info" id="infoPagina">Página 1 de 1</span>
@@ -366,7 +366,7 @@
             bouchard: "bouchard123",
             cossani: "cossani123",
             previsora: "previsora123",
-            admin: "felipe" // CLAVE MAESTRA PARA CONTROL TOTAL DEL REGISTRO CIVIL
+            admin: "felipe"
         };
 
         let todasLasActas = [];
@@ -375,11 +375,22 @@
         const registrosPorPagina = 10;
         let operarioActivo = "ninguno"; 
 
-        // Valida la clave contrastándola con la opción elegida en el menú desplegable
+        function toggleFormularioCarga() {
+            const panel = document.getElementById("panelCarga");
+            if (panel.style.display === "none" || panel.style.display === "") {
+                panel.style.display = "block";
+                panel.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                panel.style.display = "none";
+            }
+        }
+
+        // Valida contraseñas y comanda qué botones prender u ocultar
         function validarCredenciales() {
             const perfilSeleccionado = document.getElementById("selectPerfil").value;
             const claveIngresada = document.getElementById("inputClave").value;
             const textoEstado = document.getElementById("textoEstadoAuth");
+            const btnDisparador = document.getElementById("btnDisparadorCarga");
             const panelCarga = document.getElementById("panelCarga");
             
             if (claveIngresada === PERMISOS_SISTEMA[perfilSeleccionado]) {
@@ -387,20 +398,22 @@
                 
                 if (perfilSeleccionado === "admin") {
                     textoEstado.innerHTML = "👑 Conectado como: <strong style='color:#3182ce;'>ADMINISTRADOR CIVIL (Control Total)</strong>. Descargas abiertas.";
+                    btnDisparador.style.display = "none"; 
                     panelCarga.style.display = "none";
                 } else {
                     textoEstado.innerHTML = `🟢 Conectado como fúnebre: <strong style='text-transform:uppercase;'>${perfilSeleccionado}</strong>. Subidas y descargas habilitadas.`;
-                    panelCarga.style.display = "block";
+                    btnDisparador.style.display = "inline-flex"; 
                     document.getElementById("uploadEmpresa").value = perfilSeleccionado;
                 }
             } else {
                 operarioActivo = "ninguno";
                 textoEstado.innerHTML = "❌ Contraseña inválida para el operario seleccionado.";
+                btnDisparador.style.display = "none";
                 panelCarga.style.display = "none";
                 alert("La contraseña ingresada no coincide con el perfil seleccionado.");
             }
             
-            renderizarTabla(); // Refresca las celdas aplicando los candados o botones verdes en el acto
+            renderizarTabla();
         }
 
         async function cargarActasDesdeDrive() {
@@ -442,7 +455,6 @@
                 const fila = document.createElement("tr");
                 let celdaBoton = "";
 
-                // Evaluación de Privacidad
                 if (operarioActivo === "admin" || operarioActivo === acta.empresa) {
                     celdaBoton = `
                         <a href="${acta.link}" target="_self" class="btn-open" title="Descargar acta">
@@ -477,7 +489,6 @@
         }
 
         function cambiarPagina(dir) { paginaActual += dir; renderizarTabla(); }
-        
         function ejecutarBusqueda() {
             const crit = document.getElementById("inputBuscar").value.toUpperCase();
             actasFiltradas = todasLasActas.filter(a => a.nombre.includes(crit));
@@ -485,10 +496,11 @@
             renderizarTabla();
         }
 
+        // FUNCIÓN DE SUBIDA CORREGIDA AL 100% EN FORMATO BASE64 LIMPÌO
         function prepararYEnviar(event) {
             event.preventDefault();
             const btn = document.getElementById("btnSubir");
-            const archivoInput = document.getElementById("uploadFile").files;
+            const archivoInput = document.getElementById("uploadFile").files[0]; // Captura el archivo individual propiamente dicho
             const nombre = document.getElementById("uploadNombre").value;
             const empresa = document.getElementById("uploadEmpresa").value;
 
@@ -499,8 +511,9 @@
 
             const lector = new FileReader();
             lector.onload = async function(e) {
+                // CORRECCIÓN CRÍTICA: Extrae estrictamente la cadena de texto Base64 pura de la posición [1] e ignora cabeceras
                 const fragmentos = e.target.result.split(',');
-                const base64Limpio = fragmentos[1];
+                const base64Limpio = fragmentos[1]; 
                 
                 const payload = {
                     nombre: nombre,
@@ -516,14 +529,15 @@
                     });
                     const resultado = await respuesta.json();
                     if (resultado.resultado === "OK") {
-                        alert("¡Acta subida con éxito!");
+                        alert("¡Acta subida con éxito a tu carpeta de Google Drive!");
                         document.getElementById("uploadForm").reset();
-                        cargarActasDesdeDrive();
+                        document.getElementById("panelCarga").style.display = "none";
+                        cargarActasDesdeDrive(); // Recarga automáticamente la lista de a 10 con la nueva acta arriba
                     } else {
-                        alert("Error: " + resultado.mensaje);
+                        alert("Error de Google Drive: " + resultado.mensaje);
                     }
                 } catch (err) {
-                    alert("Error en el envío.");
+                    alert("Error en la carga de datos. Verificá tu conexión de red.");
                 } finally {
                     btn.disabled = false;
                     btn.innerText = "Confirmar y Subir a Drive";
@@ -536,3 +550,4 @@
     </script>
 </body>
 </html>
+
