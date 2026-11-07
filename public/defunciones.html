@@ -141,7 +141,7 @@
         .badge-cossani { background-color: rgba(66, 184, 115, 0.15); color: #42b873; border: 1px solid rgba(66, 184, 115, 0.3); }
         .badge-previsora { background-color: rgba(168, 82, 156, 0.15); color: #a8529c; border: 1px solid rgba(168, 82, 156, 0.3); }
 
-        /* Botón de descarga con estilo sobrio y cómodo para el dedo */
+        /* Botón de descarga nativo SVG */
         .btn-open {
             color: #a0aec0;
             text-decoration: none;
@@ -170,7 +170,48 @@
             transform: scale(1.05);
         }
 
-        .loading {
+        /* DISEÑO DE LA CONTENEDORA DE PAGINACIÓN */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 950px;
+        }
+
+        .btn-page {
+            background-color: #2a2f3b;
+            border: 1px solid #323946;
+            color: #ffffff;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .btn-page:hover:not(:disabled) {
+            background-color: #ffffff;
+            color: #1e222b;
+            border-color: #ffffff;
+        }
+
+        .btn-page:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            font-size: 1rem;
+            color: #a0aec0;
+            font-weight: 500;
+        }
+
+        .loading, .no-results {
             padding: 40px;
             text-align: center;
             color: #a0aec0;
@@ -179,10 +220,7 @@
 
         .no-results {
             display: none;
-            padding: 40px;
-            text-align: center;
             color: #718096;
-            font-size: 1rem;
         }
     </style>
 </head>
@@ -195,7 +233,7 @@
     <!-- Buscador en tiempo real -->
     <div class="search-container">
         <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-        <input type="text" id="inputBuscar" class="search-input" placeholder="Buscar fallecido..." onkeyup="filtrarActas()" disabled>
+        <input type="text" id="inputBuscar" class="search-input" placeholder="Buscar fallecido..." onkeyup="ejecutarBusqueda()" disabled>
     </div>
     <!-- Contenedor de la Tabla -->
     <div class="table-container">
@@ -213,7 +251,7 @@
                 </tr>
             </thead>
             <tbody id="cuerpoTabla">
-                <!-- Los renglones se generan automáticamente aquí -->
+                <!-- Los renglones agrupados se inyectan acá de forma dinámica -->
             </tbody>
         </table>
 
@@ -222,50 +260,41 @@
         </div>
     </div>
 
+    <!-- Controles de navegación de páginas (10 por grupo) -->
+    <div class="pagination-container" id="controlPaginacion" style="display: none;">
+        <button class="btn-page" id="btnAnterior" onclick="cambiarPagina(-1)">Anterior</button>
+        <span class="page-info" id="infoPagina">Página 1 de 1</span>
+        <button class="btn-page" id="btnSiguiente" onclick="cambiarPagina(1)">Siguiente</button>
+    </div>
+
     <script>
         // URL DE TU GOOGLE APPS SCRIPT (REEMPLAZÁ ESTA URL POR LA TUYA)
         const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbx1PgdBYUFe0nfN3wE43nibAtTFhi3mBTPDo8GB6W8VXarRnXa-RAOV6uEXtwQWcVO-0w/exec";
         
         let todasLasActas = [];
+        let actasFiltradas = [];
+        let paginaActual = 1;
+        const registrosPorPagina = 10; // LÍMITE REQUERIDO DE 10 REGISTROS POR PÁGINA
 
         // Consulta automática a Google Drive
         async function cargarActasDesdeDrive() {
             try {
                 const respuesta = await fetch(URL_SCRIPT);
                 todasLasActas = await respuesta.json();
-                
-                const cuerpoTabla = document.getElementById("cuerpoTabla");
-                cuerpoTabla.innerHTML = ""; 
+                actasFiltradas = [...todasLasActas]; // Clonar lista inicial
                 
                 if(todasLasActas.length === 0) {
                     document.getElementById("loadingState").innerHTML = "No se encontraron archivos.";
                     return;
                 }
 
-                // Generar filas poniendo el botón de descarga a la izquierda con gráfico SVG integrado nativo
-                todasLasActas.forEach(acta => {
-                    const fila = document.createElement("tr");
-                    fila.className = "acta-row";
-                    
-                    fila.innerHTML = `
-                        <td style="text-align: center;">
-                            <a href="${acta.link}" target="_self" class="btn-open" title="Descargar acta">
-                                <svg viewBox="0 0 24 24">
-                                    <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/>
-                                </svg>
-                            </a>
-                        </td>
-                        <td style="font-weight: 500;">${acta.nombre}</td>
-                        <td><span class="badge badge-${acta.empresa}">${acta.empresa}</span></td>
-                        <td class="col-fecha">${acta.fechaTexto}</td>
-                    `;
-                    cuerpoTabla.appendChild(fila);
-                });
-
                 document.getElementById("loadingState").style.display = "none";
                 document.getElementById("tablaActas").style.display = "table";
+                document.getElementById("controlPaginacion").style.display = "flex";
                 document.getElementById("inputBuscar").disabled = false;
-                document.getElementById("inputBuscar").placeholder = "Buscar entre " + todasLasActas.length + " actas...";
+                
+                paginaActual = 1;
+                renderizarTabla();
 
             } catch (error) {
                 console.error("Error:", error);
@@ -273,31 +302,72 @@
             }
         }
 
-        // Buscador interno
-        function filtrarActas() {
-            const filter = document.getElementById("inputBuscar").value.toUpperCase();
-            const rows = document.getElementsByClassName("acta-row");
-            const sinResultados = document.getElementById("sinResultados");
-            const tabla = document.getElementById("tablaActas");
-            let encontrados = 0;
+        // Renderiza solo las 10 filas de la página activa
+        function renderizarTabla() {
+            const cuerpoTabla = document.getElementById("cuerpoTabla");
+            cuerpoTabla.innerHTML = "";
+            
+            const inicio = (paginaActual - 1) * registrosPorPagina;
+            const fin = inicio + registrosPorPagina;
+            const bloquePagina = actasFiltradas.slice(inicio, fin);
 
-            for (let i = 0; i < rows.length; i++) {
-                const textoFila = rows[i].textContent || rows[i].innerText;
-                if (textoFila.toUpperCase().indexOf(filter) > -1) {
-                    rows[i].style.display = "";
-                    encontrados++;
-                } else {
-                    rows[i].style.display = "none";
-                }
+            if (bloquePagina.length === 0) {
+                document.getElementById("tablaActas").style.display = "none";
+                document.getElementById("sinResultados").style.display = "block";
+                document.getElementById("controlPaginacion").style.display = "none";
+                return;
             }
 
-            if (encontrados === 0 && filter !== "") {
-                tabla.style.display = "none";
-                sinResultados.style.display = "block";
-            } else {
-                tabla.style.display = "table";
-                sinResultados.style.display = "none";
-            }
+            document.getElementById("tablaActas").style.display = "table";
+            document.getElementById("sinResultados").style.display = "none";
+            document.getElementById("controlPaginacion").style.display = "flex";
+
+            bloquePagina.forEach(acta => {
+                const fila = document.createElement("tr");
+                fila.innerHTML = `
+                    <td style="text-align: center;">
+                        <a href="${acta.link}" target="_self" class="btn-open" title="Descargar acta">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/>
+                            </svg>
+                        </a>
+                    </td>
+                    <td style="font-weight: 500;">${acta.nombre}</td>
+                    <td><span class="badge badge-${acta.empresa}">${acta.empresa}</span></td>
+                    <td class="col-fecha">${acta.fechaTexto}</td>
+                `;
+                cuerpoTabla.appendChild(fila);
+            });
+
+            actualizarControles();
+        }
+
+        // Controla los bloqueos de botones Anterior/Siguiente e indicador de texto
+        function actualizarControles() {
+            const totalPaginas = Math.ceil(actasFiltradas.length / registrosPorPagina) || 1;
+            document.getElementById("infoPagina").innerText = `Página ${paginaActual} de ${totalPaginas}`;
+            document.getElementById("btnAnterior").disabled = (paginaActual === 1);
+            document.getElementById("btnSiguiente").disabled = (paginaActual === totalPaginas);
+            document.getElementById("inputBuscar").placeholder = "Buscar entre " + actasFiltradas.length + " actas vigentes...";
+        }
+
+        // Ejecuta el salto de página
+        function cambiarPagina(direccion) {
+            paginaActual += direccion;
+            renderizarTabla();
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Sube suave al cambiar de página
+        }
+
+        // Motor de filtrado instantáneo integrado con la paginación de 10
+        function ejecutarBusqueda() {
+            const criterio = document.getElementById("inputBuscar").value.toUpperCase();
+            
+            actasFiltradas = todasLasActas.filter(acta => {
+                return acta.nombre.toUpperCase().includes(criterio);
+            });
+
+            paginaActual = 1; // Reinicia siempre a la primera página al escribir
+            renderizarTabla();
         }
 
         window.onload = cargarActasDesdeDrive;
