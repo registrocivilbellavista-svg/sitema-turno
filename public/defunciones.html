@@ -2,374 +2,297 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Archivo Central de Defunciones - Registro Civil</title>
-    
-    <!-- Librería de íconos Font Awesome 6 Premium Estables -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISTEMA DE DEFUNCIONES - Registro Civil Bella Vista</title>
+    <!-- Enlace a la biblioteca de iconos Font Awesome -->
     <link rel="stylesheet" href="https://cloudflare.com">
-    
     <style>
-        /* CONFIGURACIÓN DE APLICACIÓN RESPONSIVA SMARTPHONE */
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            margin: 0; padding: 0; background-color: #f7fafc; color: #2d3748; 
-            display: flex; flex-direction: column; min-height: 100vh;
-            -webkit-tap-highlight-color: transparent; user-select: none;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #1e222b; /* Fondo oscuro institucional */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            color: #ffffff;
+            box-sizing: border-box;
         }
-        .app-container {
-            flex-grow: 1; padding: 20px; padding-bottom: 95px; box-sizing: border-box;
-            overflow-y: auto; max-width: 600px; margin: 0 auto; width: 100%;
+
+        .header-container {
+            text-align: center;
+            margin-bottom: 30px;
         }
 
-        /* MARQUESINA INSTITUCIONAL */
-        .app-header {
-            background-color: #1a365d; color: white; padding: 20px; text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;
+        h1 {
+            color: #ffffff;
+            margin: 0 0 10px 0;
+            font-size: 2.2rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
-        .app-header i { font-size: 32px; color: #63b3ed; margin-bottom: 8px; }
-        .app-header h1 { font-size: 18px; margin: 0; text-transform: uppercase; letter-spacing: 1px; }
-        .app-header p { font-size: 12px; margin: 4px 0 0 0; color: #a0aec0; }
 
-        /* NAVEGACIÓN SPA */
-        .app-screen { display: none; animation: fadeIn 0.25s ease-in-out; }
-        .app-screen.active { display: block; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-top: 15px; border: 1px solid #e2e8f0; }
-
-        /* INPUTS ERGONÓMICOS TÁCTILES */
-        label { font-weight: 700; display: block; margin-top: 15px; margin-bottom: 6px; font-size: 13px; color: #4a5568; text-transform: uppercase; letter-spacing: 0.5px; }
-        label i { font-size: 16px; color: #3182ce; margin-right: 6px; }
-        
-        input[type="text"], input[type="number"], select {
-            width: 100%; padding: 14px; border: 1px solid #cbd5e0; border-radius: 8px; box-sizing: border-box; font-size: 15px; background-color: #fff; transition: all 0.2s ease;
+        p {
+            color: #a0aec0;
+            margin: 0;
+            font-size: 1.1rem;
         }
-        input:focus, select:focus { border-color: #3182ce; outline: none; box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15); }
 
-        /* PALETA DE ACCIONES POR SEVERIDAD */
-        .btn {
-            background-color: #3182ce; color: white; border: none; width: 100%; padding: 15px; border-radius: 8px; font-size: 15px; font-weight: bold;
-            display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: background 0.2s, transform 0.1s; margin-top: 20px; box-shadow: 0 4px 10px rgba(49, 130, 206, 0.2);
+        /* Buscador Inteligente */
+        .search-container {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 40px;
+            position: relative;
         }
-        .btn:active { transform: scale(0.98); background-color: #2b6cb0; }
-        .btn-danger { background-color: #e53e3e; box-shadow: 0 4px 10px rgba(229, 62, 62, 0.2); }
-        .btn-danger:active { background-color: #c53030; }
-        .btn-secondary { background-color: #718096; box-shadow: 0 4px 10px rgba(113, 128, 150, 0.2); }
-        .btn-secondary:active { background-color: #4a5568; }
 
-        /* RENDERS VISUALES DE ACTAS */
-        .result-item { background: white; border-radius: 10px; padding: 16px; margin-bottom: 12px; border: 1px solid #e2e8f0; border-left: 6px solid #4a5568; display: flex; flex-direction: column; gap: 6px; position: relative; }
-        .result-item.bouchard { border-left-color: #3182ce; }   
-        .result-item.cossani { border-left-color: #38a169; }    
-        .result-item.previsora { border-left-color: #d69e2e; }  
+        .search-container i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #718096;
+            font-size: 1.3rem;
+        }
 
-        .result-item h3 { margin: 0; font-size: 16px; color: #1a202c; text-transform: uppercase; }
-        .result-item p { margin: 2px 0; font-size: 13.5px; color: #4a5568; display: flex; align-items: center; gap: 6px; }
-        .result-item p i { width: 16px; text-align: center; color: #718096; font-size: 14px; }
-        .btn-drive-link { background-color: #38a169; color: #fff; padding: 10px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold; display: inline-flex; align-items: center; gap: 6px; width: fit-content; margin-top: 8px; box-shadow: 0 3px 6px rgba(0,0,0,0.05); }
+        .search-input {
+            width: 100%;
+            padding: 16px 20px 16px 55px;
+            background-color: #2a2f3b;
+            border: 2px solid #323946;
+            border-radius: 50px;
+            color: #ffffff;
+            font-size: 1.1rem;
+            outline: none;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
 
-        /* BARRA FIJA AL ALCANCE DEL PULGAR */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background-color: #ffffff; height: 70px; display: flex; box-shadow: 0 -4px 15px rgba(0,0,0,0.06); border-top: 1px solid #edf2f7; z-index: 1000; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #718096; font-size: 11px; font-weight: bold; text-decoration: none; gap: 4px; cursor: pointer; transition: color 0.15s; }
-        .nav-item i { font-size: 20px; }
-        .nav-item.active { color: #3182ce; }
+        .search-input:focus {
+            border-color: #4a5568;
+            background-color: #2d3342;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+        }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        /* Tabla de Actas */
+        .table-container {
+            width: 100%;
+            max-width: 950px;
+            background-color: #222630;
+            border: 1px solid #323946;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            overflow: hidden;
+            position: relative;
+            min-height: 150px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background-color: #2a2f3b;
+            color: #a0aec0;
+            padding: 16px 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #323946;
+        }
+
+        td {
+            padding: 14px 20px;
+            border-bottom: 1px solid #2d3342;
+            font-size: 1rem;
+        }
+
+        tr:hover td {
+            background-color: #282e3a;
+        }
+
+        .col-fecha {
+            color: #cbd5e0;
+            font-size: 0.9rem;
+        }
+
+        /* Etiquetas de las Empresas */
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-bouchard { background-color: rgba(82, 133, 197, 0.15); color: #5285c5; border: 1px solid rgba(82, 133, 197, 0.3); }
+        .badge-cossani { background-color: rgba(66, 184, 115, 0.15); color: #42b873; border: 1px solid rgba(66, 184, 115, 0.3); }
+        .badge-previsora { background-color: rgba(168, 82, 156, 0.15); color: #a8529c; border: 1px solid rgba(168, 82, 156, 0.3); }
+
+        /* Botón Ver Acta */
+        .btn-open {
+            color: #718096;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #2a2f3b;
+            border: 1px solid #323946;
+            transition: all 0.2s ease;
+        }
+
+        .btn-open:hover {
+            background-color: #ffffff;
+            color: #1e222b;
+            transform: scale(1.05);
+        }
+
+        /* Estados de Carga y Mensajes */
+        .loading {
+            padding: 40px;
+            text-align: center;
+            color: #a0aec0;
+            font-size: 1.1rem;
+        }
+
+        .no-results {
+            display: none;
+            padding: 40px;
+            text-align: center;
+            color: #718096;
+            font-size: 1.1rem;
+        }
     </style>
 </head>
 <body>
 
-<div class="app-header">
-    <i class="fa-solid fa-box-archive"></i>
-    <h1>Archivo de Defunciones</h1>
-    <p>Registro Civil • Bella Vista</p>
-</div>
+    <div class="header-container">
+        <h1>SISTEMA DE DEFUNCIONES</h1>
+        <p>Registro Civil Bella Vista - Sincronización Automática con Google Drive</p>
+    </div>
 
-<div class="app-container">
-    
-    <!-- PANTALLA 1: BUSCADOR CENTRAL -->
-    <div id="screenBuscar" class="app-screen active">
-        <label for="searchBar"><i class="fa-solid fa-magnifying-glass"></i> Buscar por DNI o Apellido/Nombre:</label>
-        <input type="text" id="searchBar" placeholder="Escribí para filtrar al instante..." oninput="buscarActas()">
+    <!-- Buscador en tiempo real -->
+    <div class="search-container">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="inputBuscar" class="search-input" placeholder="Buscar fallecido por nombre o apellido..." onkeyup="filtrarActas()" disabled>
+    </div>
+    <!-- Contenedor de la Tabla -->
+    <div class="table-container">
+        <div id="loadingState" class="loading">
+            <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 2rem; margin-bottom: 15px; display: block; color: #5285c5;"></i>
+            Conectando con Google Drive y cargando actas vigentes...
+        </div>
+
+        <table id="tablaActas" style="display: none;">
+            <thead>
+                <tr>
+                    <th>Fallecido (Nombre Completo)</th>
+                    <th>Empresa Cobertura</th>
+                    <th>Última Actualización</th>
+                    <th style="text-align: center; width: 80px;">Ver Acta</th>
+                </tr>
+            </thead>
+            <tbody id="cuerpoTabla">
+                <!-- Los renglones ordenados por fecha se generan automáticamente -->
+            </tbody>
+        </table>
+
+        <div class="no-results" id="sinResultados">
+            <i class="fa-solid fa-folder-open" style="font-size: 2.5rem; margin-bottom: 10px; display: block;"></i>
+            No se encontraron actas que coincidan con el criterio ingresado.
+        </div>
+    </div>
+
+    <script>
+        // URL DE TU GOOGLE APPS SCRIPT (REEMPLAZÁ ESTA URL POR LA TUYA)
+        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbx1PgdBYUFe0nfN3wE43nibAtTFhi3mBTPDo8GB6W8VXarRnXa-RAOV6uEXtwQWcVO-0w/exec";
         
-        <div style="margin-top: 15px; display: flex; gap: 5px; overflow-x: auto; padding-bottom: 5px;">
-            <select id="filterCategoria" onchange="buscarActas()" style="padding: 10px; font-size: 13px; height: auto;">
-                <option value="todos">📁 Ver Todas las Cocherías</option>
-                <option value="bouchard">🔷 Cochería Bouchard</option>
-                <option value="cossani">🔶 Cochería Cossani</option>
-                <option value="previsora">🔶 Cochería Previsora</option>
-                <option value="general">📁 General / Otras Actas</option>
-            </select>
-        </div>
-        <div id="resultsCount" style="font-size: 12px; font-weight: bold; color: #718096; margin-top: 15px; text-transform: uppercase;">Actas encontradas: 0</div>
-        <div id="searchResultsContainer" style="margin-top: 10px;"></div>
-    </div>
+        let todasLasActas = [];
 
-    <!-- PANTALLA 2: CARGAR NUEVA ACTA -->
-    <div id="screenCargar" class="app-screen">
-        <div class="card">
-            <h2 style="margin-top:0; font-size: 16px; color: #1a365d; text-transform: uppercase; display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-file-circle-plus" style="color:#3182ce;"></i> Registrar Acta Digitalizada</h2>
-            
-            <label for="actaDni"><i class="fa-solid fa-id-card"></i> N° de DNI del Fallecido:</label>
-            <input type="number" id="actaDni" placeholder="Ej: 14234567" required>
-
-            <label for="actaNombre"><i class="fa-solid fa-user"></i> Apellidos y Nombres:</label>
-            <input type="text" id="actaNombre" placeholder="Ej: PÉREZ JUAN CARLOS" required style="text-transform: uppercase;">
-
-            <label for="actaNumero"><i class="fa-solid fa-hashtag"></i> Número de Acta / Tomo / Folio:</label>
-            <input type="text" id="actaNumero" placeholder="Ej: Acta 12 - Tomo I - Folio 45">
-
-            <label for="actaAnio"><i class="fa-solid fa-calendar-days"></i> Año de la Defunción:</label>
-            <input type="number" id="actaAnio" value="2026">
-
-            <label for="actaCategoria"><i class="fa-solid fa-building"></i> Clasificación / Cochería:</label>
-            <select id="actaCategoria">
-                <option value="general">General / Carpeta Raíz</option>
-                <option value="bouchard">BOUCHARD v03022026</option>
-                <option value="cossani">COSSANI v03022026</option>
-                <option value="previsora">PREVISORA v03022026</option>
-            </select>
-
-            <label for="actaDriveUrl"><i class="fa-solid fa-cloud"></i> Enlace de Archivo (Google Drive):</label>
-            <input type="text" id="actaDriveUrl" placeholder="Pegá el link para compartir de Drive aquí...">
-
-            <button class="btn" id="btnGuardar" onclick="guardarActa()"><i class="fa-solid fa-floppy-disk"></i> Guardar Acta en Registro</button>
-        </div>
-    </div>
-
-    <!-- PANTALLA 3: RESPALDOS Y ENTORNO -->
-    <div id="screenConfig" class="app-screen">
-        <div class="card">
-            <h2 style="margin-top:0; font-size: 16px; color: #1a365d; text-transform: uppercase;"><i class="fa-solid fa-shield-halved" style="color:#3182ce;"></i> Resguardo de Información</h2>
-            <p style="font-size: 13px; color: #4a5568; line-height: 1.5;">Toda la base de datos se aloja en tiempo real en la nube centralizada de la oficina.</p>
-            <button class="btn btn-secondary" onclick="exportarBaseDatos()"><i class="fa-solid fa-file-export"></i> Exportar Resguardo (JSON)</button>
-            <label for="importFile" style="background-color: #4a5568; color: white; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 12px;"><i class="fa-solid fa-file-import"></i> Importar Resguardo (JSON)</label>
-            <input type="file" id="importFile" accept=".json" onchange="importarBaseDatos(event)" style="display: none;">
-        </div>
-        <div class="card" style="border-top: 4px solid #e53e3e;">
-            <h2 style="margin-top:0; font-size: 16px; color: #c53030; text-transform: uppercase;"><i class="fa-solid fa-triangle-exclamation"></i> Zona de Peligro</h2>
-            <button class="btn btn-danger" onclick="eliminarTodaLaBase()"><i class="fa-solid fa-trash-can"></i> Borrar Toda la Base de Datos</button>
-        </div>
-    </div>
-</div>
-
-<div class="bottom-nav">
-    <div id="navBuscar" class="nav-item active" onclick="switchScreen('screenBuscar', this)"><i class="fa-solid fa-magnifying-glass"></i><span>Buscar</span></div>
-    <div id="navCargar" class="nav-item" onclick="switchScreen('screenCargar', this)"><i class="fa-solid fa-file-circle-plus"></i><span>Cargar</span></div>
-    <div id="navConfig" class="nav-item" onclick="switchScreen('screenConfig', this)"><i class="fa-solid fa-gears"></i><span>Resguardos</span></div>
-</div>
-<script>
-    // URL CENTRALIZADA DE PRODUCCIÓN ACTIVA CONECTADA A TU NUEVA PLANILLA
-    const API_URL_SHEETS = "https://google.com";
-    
-    let baseActasDefuncion = [];
-
-    // Control de navegación interna SPA
-    function switchScreen(screenId, navElement) {
-        document.getElementById('screenBuscar').style.display = 'none';
-        document.getElementById('screenCargar').style.display = 'none';
-        document.getElementById('screenConfig').style.display = 'none';
-        document.getElementById('navBuscar').classList.remove('active');
-        document.getElementById('navCargar').classList.remove('active');
-        document.getElementById('navConfig').classList.remove('active');
-
-        const targetScreen = document.getElementById(screenId);
-        if (targetScreen) targetScreen.style.display = 'block';
-        if (navElement) navElement.classList.add('active');
-
-        if (screenId === 'screenCargar') {
-            limpiarFormularioActas();
-        } else if (screenId === 'screenBuscar') {
-            buscarActas();
-        }
-    }
-
-    // Escritura por Inyección Dinámica (JSONP): Canal seguro libre de bloqueos CORS
-    function guardarActa() {
-        const dni = document.getElementById('actaDni').value.trim();
-        const nombre = document.getElementById('actaNombre').value.trim().toUpperCase();
-        const numero = document.getElementById('actaNumero').value.trim() || '-';
-        const anio = document.getElementById('actaAnio').value.trim() || '2026';
-        const categoria = document.getElementById('actaCategoria').value;
-        const driveUrl = document.getElementById('actaDriveUrl').value.trim() || 'https://google.com';
-
-        if (!dni || !nombre) {
-            alert('⚠️ Por favor complete el número de DNI y los Nombres/Apellidos del fallecido.');
-            return;
-        }
-
-        const btnGuardar = document.getElementById('btnGuardar');
-        if (btnGuardar) {
-            btnGuardar.disabled = true;
-            btnGuardar.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Guardando en la nube...`;
-        }
-
-        // Definición de respuesta global transaccional
-        window.respuestaGuardarGoogle = function(resultado) {
-            if (resultado.status === "success") {
-                alert('✨ Registro guardado con éxito en el archivo central.');
-                limpiarFormularioActas();
-                switchScreen('screenBuscar', document.getElementById('navBuscar'));
-            } else {
-                alert('⚠️ Ocurrió un inconveniente al intentar guardar el registro.');
-            }
-            if (btnGuardar) btnGuardar.disabled = false;
-            scriptTemp.remove();
-        };
-
-        // Construir inyección temporal independiente para el despacho
-        const scriptTemp = document.createElement('script');
-        scriptTemp.src = API_URL_SHEETS + "?accion=guardar&dni=" + encodeURIComponent(dni) + "&nombre=" + encodeURIComponent(nombre) + "&numero=" + encodeURIComponent(numero) + "&anio=" + encodeURIComponent(anio) + "&categoria=" + encodeURIComponent(categoria) + "&driveUrl=" + encodeURIComponent(driveUrl) + "&callback=respuestaGuardarGoogle";
-        document.body.appendChild(scriptTemp);
-    }
-    // Lectura por Inyección Dinámica (JSONP) libre de restricciones CORS
-    function buscarActas() {
-        const container = document.getElementById('searchResultsContainer');
-        const countIndicator = document.getElementById('resultsCount');
-        if (!container) return;
-
-        const query = document.getElementById('searchBar').value.trim().toLowerCase();
-        const categoriaFiltro = document.getElementById('filterCategoria').value;
-        
-        if (query.length === 0) {
-            container.innerHTML = `
-                <div style="text-align:center; color:#718096; padding:30px; font-style:italic;">
-                    <i class="fa-solid fa-magnifying-glass" style="font-size:36px; margin-bottom:10px; display:block; color:#cbd5e0;"></i>
-                    Ingrese un DNI o Apellido en la barra superior para buscar un acta.
-                </div>
-            `;
-            countIndicator.textContent = 'Actas encontradas: 0';
-            return; 
-        }
-
-        const scriptViejo = document.getElementById('jsonpScriptGoogle');
-        if (scriptViejo) scriptViejo.remove(); 
-
-        window.procesarDatosDesdeGoogle = function(datosNube) {
-            baseActasDefuncion = datosNube;
-            container.innerHTML = '';
-            let contador = 0;
-
-            baseActasDefuncion.forEach((acta) => {
-                const cumpleCategoria = (categoriaFiltro === 'todos' || acta.categoria === categoriaFiltro);
-                const cumpleTexto = (acta.dni.includes(query) || acta.nombre.toLowerCase().includes(query));
-
-                if (cumpleCategoria && cumpleTexto) {
-                    contador++;
-                    const div = document.createElement('div');
-                    div.className = "result-item " + acta.categoria;
-
-                    let textoCat = "General / Otras";
-                    if (acta.categoria === 'bouchard') textoCat = "BOUCHARD v03022026";
-                    if (acta.categoria === 'cossani') textoCat = "COSSANI v03022026";
-                    if (acta.categoria === 'previsora') textoCat = "PREVISORA v03022026";
-
-                    div.innerHTML = `
-                        <h3>` + acta.nombre + `</h3>
-                        <p><i class="fa-solid fa-id-card"></i> <strong>DNI:</strong> ` + acta.dni + `</p>
-                        <p><i class="fa-solid fa-hashtag"></i> <strong>Datos:</strong> ` + acta.numero + `</p>
-                        <p><i class="fa-solid fa-calendar-day"></i> <strong>Año Defunción:</strong> ` + acta.anio + `</p>
-                        <p><i class="fa-solid fa-building"></i> <strong>Carpeta:</strong> ` + textoCat + `</p>
-                        <a href="` + acta.driveUrl + `" class="btn-drive-link" target="_blank"><i class="fa-brands fa-google-drive"></i> Abrir Acta Digital</a>
-                    `;
-                    container.appendChild(div);
+        // Función para consultar a Google Drive de forma automática al abrir la página
+        async function cargarActasDesdeDrive() {
+            try {
+                const respuesta = await fetch(URL_SCRIPT);
+                todasLasActas = await respuesta.json();
+                
+                const cuerpoTabla = document.getElementById("cuerpoTabla");
+                cuerpoTabla.innerHTML = ""; // Limpiar spinner de carga
+                
+                if(todasLasActas.length === 0) {
+                    document.getElementById("loadingState").innerHTML = "No se encontraron archivos en las carpetas vinculadas.";
+                    return;
                 }
-            });
 
-            countIndicator.textContent = "Actas encontradas: " + contador;
-            if (contador === 0) {
-                container.innerHTML = `<div style="text-align:center; color:#718096; padding:30px; font-style:italic;"><i class="fa-solid fa-folder-open" style="font-size:36px; margin-bottom:10px; display:block; color:#cbd5e0;"></i>No se encontraron actas digitalizadas que coincidan.</div>`;
-            }
-            nuevoScript.remove();
-        };
-
-        const nuevoScript = document.createElement('script');
-        nuevoScript.id = 'jsonpScriptGoogle';
-        nuevoScript.src = API_URL_SHEETS + "?accion=leer&callback=procesarDatosDesdeGoogle";
-        document.body.appendChild(nuevoScript);
-    }
-
-    function limpiarFormularioActas() {
-        document.getElementById('actaDni').value = '';
-        document.getElementById('actaNombre').value = '';
-        document.getElementById('actaNumero').value = '';
-        document.getElementById('actaAnio').value = '2026';
-        document.getElementById('actaCategoria').value = 'general';
-        document.getElementById('actaDriveUrl').value = '';
-        const btn = document.getElementById('btnGuardar');
-        if (btn) { btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Acta en Registro'; }
-    }
-
-    function exportarBaseDatos() {
-        if (baseActasDefuncion.length === 0) { alert('⚠️ Realice una consulta primero para cargar los registros en memoria.'); return; }
-        const dataStr = "data:text/json;charset=utf-8,\uFEFF" + encodeURIComponent(JSON.stringify(baseActasDefuncion, null, 2));
-        const downloadAnchor = document.createElement('a');
-        downloadAnchor.setAttribute("href", dataStr);
-        downloadAnchor.setAttribute("download", "Resguardo_Actas.json");
-        document.body.appendChild(downloadAnchor);
-        downloadAnchor.click();
-        downloadAnchor.remove();
-    }
-
-    async function importarBaseDatos(event) {
-        const input = event.target;
-        if (!input.files || input.files.length === 0) return;
-
-        const archivo = input.files;
-        const lector = new FileReader();
-
-        lector.onload = async function(e) {
-            let datosImportados = [];
-            try { datosImportados = JSON.parse(e.target.result); } catch (err) { alert('❌ El archivo seleccionado es inválido.'); return; }
-
-            if (Array.isArray(datosImportados) && datosImportados.length > 0) {
-                if (confirm('Se detectaron ' + datosImportados.length + ' actas. ¿Desea subirlas de forma masiva a la nube de la oficina?')) {
-                    alert('Subiendo registros en segundo plano. Esto puede demorar unos instantes...');
+                // Generar dinámicamente cada fila (Vienen ordenadas por fecha más reciente desde Drive)
+                todasLasActas.forEach(acta => {
+                    const fila = document.createElement("tr");
+                    fila.className = "acta-row";
                     
-                    for(let i = 0; i < datosImportados.length; i++) {
-                        let item = datosImportados[i];
-                        if (item.dni && item.nombre) {
-                            const scriptBatch = document.createElement('script');
-                            scriptBatch.src = API_URL_SHEETS + "?accion=guardar&dni=" + encodeURIComponent(item.dni) + "&nombre=" + encodeURIComponent(item.nombre) + "&numero=" + encodeURIComponent(item.numero || '-') + "&anio=" + encodeURIComponent(item.anio || '2026') + "&categoria=" + encodeURIComponent(item.categoria || 'general') + "&driveUrl=" + encodeURIComponent(item.driveUrl || 'https://google.com') + "&callback=String";
-                            document.body.appendChild(scriptBatch);
-                            await new Promise(r => setTimeout(r, 400)); // Delay seguro anti colisiones
-                            scriptBatch.remove();
-                        }
-                    }
-                    alert('¡Importación en masa finalizada!');
-                    buscarActas();
+                    fila.innerHTML = `
+                        <td>${acta.nombre}</td>
+                        <td><span class="badge badge-${acta.empresa}">${acta.empresa}</span></td>
+                        <td class="col-fecha">${acta.fechaTexto}</td>
+                        <td style="text-align: center;">
+                            <a href="${acta.link}" target="_self" class="btn-open">
+                                <i class="fa-solid fa-file-pdf"></i>
+                            </a>
+                        </td>
+                    `;
+                    cuerpoTabla.appendChild(fila);
+                });
+
+                // Activar componentes visuales ocultos
+                document.getElementById("loadingState").style.display = "none";
+                document.getElementById("tablaActas").style.display = "table";
+                document.getElementById("inputBuscar").disabled = false;
+                document.getElementById("inputBuscar").placeholder = "Escribí para buscar entre las " + todasLasActas.length + " actas detectadas...";
+
+            } catch (error) {
+                console.error("Error cargando actas:", error);
+                document.getElementById("loadingState").innerHTML = "<i class='fa-solid fa-triangle-exclamation' style='color:#e53e3e; font-size:2rem; margin-bottom:10px; display:block;'></i> Error de conexión con el servidor de datos.";
+            }
+        }
+
+        // Buscador interno instantáneo
+        function filtrarActas() {
+            const filter = document.getElementById("inputBuscar").value.toUpperCase();
+            const rows = document.getElementsByClassName("acta-row");
+            const sinResultados = document.getElementById("sinResultados");
+            const tabla = document.getElementById("tablaActas");
+            let encontrados = 0;
+
+            for (let i = 0; i < rows.length; i++) {
+                const textoFila = rows[i].textContent || rows[i].innerText;
+                if (textoFila.toUpperCase().indexOf(filter) > -1) {
+                    rows[i].style.display = "";
+                    encontrados++;
+                } else {
+                    rows[i].style.display = "none";
                 }
-            } else {
-                alert('⚠️ El archivo de resguardo está vacío.');
             }
-        };
-        lector.readAsText(archivo);
-        input.value = '';
-    }
 
-    function eliminarTodaLaBase() {
-        if (confirm('🚨 ¡ATENCIÓN CRÍTICA!\n\n¿Está completamente seguro de borrar de forma definitiva todo el archivo central?')) {
-            const contraseña = prompt('Escriba la frase de confirmación ("Bella Vista"):');
-            if (contraseña && contraseña.toLowerCase() === 'bella vista') {
-                window.respuestaPurgarGoogle = function(res) {
-                    alert('🔥 Toda la base de datos remota ha sido eliminada por completo.');
-                    baseActasDefuncion = [];
-                    buscarActas();
-                    scriptPurge.remove();
-                };
-                const scriptPurge = document.createElement('script');
-                scriptPurge.src = API_URL_SHEETS + "?accion=purgar&callback=respuestaPurgarGoogle";
-                document.body.appendChild(scriptPurge);
+            if (encontrados === 0 && filter !== "") {
+                tabla.style.display = "none";
+                sinResultados.style.display = "block";
             } else {
-                alert('❌ Confirmación incorrecta.');
+                tabla.style.display = "table";
+                sinResultados.style.display = "none";
             }
         }
-    }
 
-    document.addEventListener("DOMContentLoaded", function() {
-        const container = document.getElementById('searchResultsContainer');
-        if (container) {
-            container.innerHTML = `<div style="text-align:center; color:#718096; padding:30px; font-style:italic;"><i class="fa-solid fa-magnifying-glass" style="font-size:36px; margin-bottom:10px; display:block; color:#cbd5e0;"></i>Ingrese un DNI o Apellido en la barra superior para buscar un acta.</div>`;
-        }
-    });
-</script>
+        // Iniciar carga automática al abrir la web
+        window.onload = cargarActasDesdeDrive;
+    </script>
+
 </body>
 </html>
