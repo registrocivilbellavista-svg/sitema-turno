@@ -118,6 +118,32 @@
             border-top: 1px solid #2d3342;
         }
 
+        /* Botón de Apertura de Formulario */
+        .btn-toggle-upload {
+            background-color: #2b6cb0;
+            color: #ffffff;
+            border: 1px solid #3182ce;
+            border-radius: 50px;
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            display: inline-flex; /* FIJO: Siempre visible desde el inicio */
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
+        }
+
+        .btn-toggle-upload:hover, .btn-toggle-upload:active {
+            background-color: #3182ce;
+            transform: scale(1.02);
+        }
+
+        .btn-toggle-upload svg { width: 20px; height: 20px; fill: currentColor; }
+
         /* Formulario Colapsable de Subida */
         .upload-wrapper {
             width: 100%;
@@ -245,7 +271,6 @@
         .badge-cossani { background-color: rgba(66, 184, 115, 0.15); color: #42b873; border: 1px solid rgba(66, 184, 115, 0.3); }
         .badge-previsora { background-color: rgba(168, 82, 156, 0.15); color: #a8529c; border: 1px solid rgba(168, 82, 156, 0.3); }
 
-        /* Botón Descarga Activo */
         .btn-open {
             color: #ffffff;
             text-decoration: none;
@@ -254,13 +279,12 @@
             justify-content: center;
             width: 42px; height: 42px;
             border-radius: 50%;
-            background-color: #2f8f57; /* Verde */
+            background-color: #2f8f57;
             border: none;
             box-shadow: 0 2px 4px rgba(0,0,0,0.15);
         }
         .btn-open svg { width: 18px; height: 18px; fill: currentColor; }
 
-        /* Icono Candado Bloqueado */
         .btn-locked {
             color: #718096;
             display: inline-flex;
@@ -287,14 +311,13 @@
         <h1>BIENVENIDOS AL SISTEMA DE DESCARGAS DE ACTAS DEFUNCION DEL REGISTRO CIVIL DE BELLA VISTA CORRIENTES</h1>
     </div>
 
-    <!-- Panel de Autenticación con Desplegable de Usuarios Pre-cargados -->
+    <!-- Panel de Autenticación con Desplegable Pre-cargado -->
     <div class="auth-container">
         <div class="auth-title">
             <svg style="width:16px; height:16px; fill:currentColor;" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
             <span>Selección de Operario y Autenticación</span>
         </div>
         <div class="auth-grid">
-            <!-- Menú Desplegable Pre-cargado -->
             <select id="selectPerfil" class="auth-select">
                 <option value="bouchard">Empresa Fúnebre: BOUCHARD</option>
                 <option value="cossani">Empresa Fúnebre: COSSANI</option>
@@ -307,7 +330,15 @@
         <div class="auth-status" id="textoEstadoAuth">Modo de consulta pública (Descargas inhabilitadas)</div>
     </div>
 
-    <!-- Formulario de Subida Directa -->
+    <!-- BOTÓN DISPARADOR: Ahora siempre visible desde el inicio -->
+    <button class="btn-toggle-upload" id="btnDisparadorCarga" onclick="toggleFormularioCarga()">
+        <svg viewBox="0 0 24 24">
+            <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-1 8h-3v3h-2v-3h-3v-2h3V9h2v3h3v2z"/>
+        </svg>
+        <span>Subir Acta Nueva</span>
+    </button>
+
+    <!-- Formulario Colapsable de Subida Directa -->
     <div class="upload-wrapper" id="panelCarga">
         <div class="upload-container">
             <div class="upload-title">Formulario de Carga Directa (Autorizado)</div>
@@ -316,8 +347,14 @@
                     <label>Nombre y Apellido del Fallecido</label>
                     <input type="text" id="uploadNombre" class="form-control" placeholder="Ej: JUAN CARLOS GOMEZ" required>
                 </div>
-                <div class="form-group" style="display:none;">
-                    <input type="text" id="uploadEmpresa">
+                <!-- Selección manual de carpeta de destino al subir -->
+                <div class="form-group">
+                    <label>Carpeta de Destino en Drive</label>
+                    <select id="uploadEmpresa" class="form-control" required>
+                        <option value="bouchard">Bouchard</option>
+                        <option value="cossani">Cossani</option>
+                        <option value="previsora">Previsora</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>Seleccionar Archivo (PDF)</label>
@@ -328,13 +365,13 @@
         </div>
     </div>
 
-    <!-- Buscador Principal -->
+    <!-- Buscador -->
     <div class="search-container">
         <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
         <input type="text" id="inputBuscar" class="search-input" placeholder="Buscar fallecido..." onkeyup="ejecutarBusqueda()" disabled>
     </div>
 
-    <!-- Contenedor de la Grilla de Actas -->
+    <!-- Tabla -->
     <div class="table-container">
         <div id="loadingState" class="loading">Cargando actas desde Drive...</div>
         <table id="tablaActas" style="display: none;">
@@ -350,7 +387,7 @@
         </table>
         <div class="no-results" id="sinResultados">No se encontraron coincidencias.</div>
     </div>
-        <!-- Controles de Paginación -->
+    <!-- Controles de Paginación -->
     <div class="pagination-container" id="controlPaginacion" style="display: none;">
         <button class="btn-page" id="btnAnterior" onclick="cambiarPagina(-1)">Anterior</button>
         <span class="page-info" id="infoPagina">Página 1 de 1</span>
@@ -366,7 +403,7 @@
             bouchard: "bouchard123",
             cossani: "cossani123",
             previsora: "previsora123",
-            admin: "felipe"
+            admin: "civilbella2026"
         };
 
         let todasLasActas = [];
@@ -390,26 +427,19 @@
             const perfilSeleccionado = document.getElementById("selectPerfil").value;
             const claveIngresada = document.getElementById("inputClave").value;
             const textoEstado = document.getElementById("textoEstadoAuth");
-            const btnDisparador = document.getElementById("btnDisparadorCarga");
-            const panelCarga = document.getElementById("panelCarga");
             
             if (claveIngresada === PERMISOS_SISTEMA[perfilSeleccionado]) {
                 operarioActivo = perfilSeleccionado;
                 
                 if (perfilSeleccionado === "admin") {
                     textoEstado.innerHTML = "👑 Conectado como: <strong style='color:#3182ce;'>ADMINISTRADOR CIVIL (Control Total)</strong>. Descargas abiertas.";
-                    btnDisparador.style.display = "none"; 
-                    panelCarga.style.display = "none";
                 } else {
                     textoEstado.innerHTML = `🟢 Conectado como fúnebre: <strong style='text-transform:uppercase;'>${perfilSeleccionado}</strong>. Subidas y descargas habilitadas.`;
-                    btnDisparador.style.display = "inline-flex"; 
                     document.getElementById("uploadEmpresa").value = perfilSeleccionado;
                 }
             } else {
                 operarioActivo = "ninguno";
                 textoEstado.innerHTML = "❌ Contraseña inválida para el operario seleccionado.";
-                btnDisparador.style.display = "none";
-                panelCarga.style.display = "none";
                 alert("La contraseña ingresada no coincide con el perfil seleccionado.");
             }
             
@@ -496,24 +526,22 @@
             renderizarTabla();
         }
 
-        // FUNCIÓN DE SUBIDA CORREGIDA AL 100% EN FORMATO BASE64 LIMPÌO
         function prepararYEnviar(event) {
             event.preventDefault();
             const btn = document.getElementById("btnSubir");
-            const archivoInput = document.getElementById("uploadFile").files[0]; // Captura el archivo individual propiamente dicho
+            const archivoInput = document.getElementById("uploadFile").files;
             const nombre = document.getElementById("uploadNombre").value;
             const empresa = document.getElementById("uploadEmpresa").value;
 
-            if (!archivoInput) return;
+            if (!archivoInput || archivoInput.length === 0) return;
 
             btn.disabled = true;
             btn.innerText = "Subiendo archivo...";
 
             const lector = new FileReader();
             lector.onload = async function(e) {
-                // CORRECCIÓN CRÍTICA: Extrae estrictamente la cadena de texto Base64 pura de la posición [1] e ignora cabeceras
                 const fragmentos = e.target.result.split(',');
-                const base64Limpio = fragmentos[1]; 
+                const base64Limpio = fragmentos[1]; // EXTRACCIÓN BASE64 REPARADA
                 
                 const payload = {
                     nombre: nombre,
@@ -529,25 +557,24 @@
                     });
                     const resultado = await respuesta.json();
                     if (resultado.resultado === "OK") {
-                        alert("¡Acta subida con éxito a tu carpeta de Google Drive!");
+                        alert("¡Acta subida con éxito!");
                         document.getElementById("uploadForm").reset();
                         document.getElementById("panelCarga").style.display = "none";
-                        cargarActasDesdeDrive(); // Recarga automáticamente la lista de a 10 con la nueva acta arriba
+                        cargarActasDesdeDrive();
                     } else {
-                        alert("Error de Google Drive: " + resultado.mensaje);
+                        alert("Error: " + resultado.mensaje);
                     }
                 } catch (err) {
-                    alert("Error en la carga de datos. Verificá tu conexión de red.");
+                    alert("Error en el envío.");
                 } finally {
                     btn.disabled = false;
                     btn.innerText = "Confirmar y Subir a Drive";
                 }
             };
-            lector.readAsDataURL(archivoInput);
+            lector.readAsDataURL(archivoInput[0]);
         }
 
         window.onload = cargarActasDesdeDrive;
     </script>
 </body>
 </html>
-
